@@ -1,21 +1,27 @@
 import { createClient } from '@/lib/supabase/server'
 import CatalogCard from '@/components/biblioteca/CatalogCard'
+import SearchBar from '@/components/biblioteca/SearchBar'
+import { Suspense } from 'react'
 
 export const metadata = {
   title: 'Catálogo — KodaBooks',
 }
 
-export default async function CatalogoPage() {
+export default async function CatalogoPage({ searchParams }) {
+  const { q } = await searchParams || {}
   const supabase = await createClient()
 
-  // Buscar todos os ebooks que estão ativos e que tenham capa ou título (Catálogo público)
-  // Devido a RLS, o usuário cliente só pode ver o que permitimos
-  // Precisamos adicionar a política no banco para que eles vejam os ativos
-  const { data: ebooks, error } = await supabase
+  let query = supabase
     .from('ebooks')
     .select('*')
     .eq('is_active', true)
     .order('created_at', { ascending: false })
+
+  if (q) {
+    query = query.ilike('title', `%${q}%`)
+  }
+
+  const { data: ebooks, error } = await query
 
   return (
     <div className="biblioteca-page">
@@ -25,6 +31,10 @@ export default async function CatalogoPage() {
           <p className="text-secondary">Descubra novos conteúdos para expandir sua biblioteca digital.</p>
         </div>
       </div>
+      
+      <Suspense fallback={<div style={{height: '80px'}}>Carregando busca...</div>}>
+        <SearchBar placeholder="Buscar no catálogo..." />
+      </Suspense>
 
       {error && (
         <div className="toast-error" style={{
@@ -40,9 +50,9 @@ export default async function CatalogoPage() {
 
       {!ebooks || ebooks.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-icon">📚</div>
-          <h3>Catálogo Vazio</h3>
-          <p>Não há e-books disponíveis para venda no momento. Volte mais tarde!</p>
+          <div className="empty-icon">🔍</div>
+          <h3>Nenhum resultado</h3>
+          <p>Não encontramos nenhum e-book correspondente a "{q}". Tente outros termos!</p>
         </div>
       ) : (
         <div className="ebook-grid">
