@@ -61,6 +61,13 @@ export default function LoginPage() {
             <span className="text-gradient">Koda</span>Books
           </h1>
           <p>Acesse sua biblioteca digital</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '16px', opacity: 0.8 }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Em parceria com</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <img src="/scorpionbits-logo.png" alt="ScorpionBits Logo" style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} />
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fff', letterSpacing: '0.02em' }}>ScorpionBits</span>
+            </div>
+          </div>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit} id="login-form">
