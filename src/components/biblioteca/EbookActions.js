@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import AddToPlaylistModal from './AddToPlaylistModal'
 
 export default function EbookActions({ ebookId, fileType, title, fileName }) {
   const [downloading, setDownloading] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   async function handleDownload() {
     setDownloading(true)
@@ -35,28 +37,45 @@ export default function EbookActions({ ebookId, fileType, title, fileName }) {
   }
 
   return (
-    <div className="ebook-actions" style={{ display: 'flex', gap: 'var(--space-md)', marginTop: 'var(--space-lg)' }}>
-      {fileType === 'pdf' && (
-        <Link 
-          href={`/biblioteca/ler/${ebookId}`}
-          className="btn btn-primary"
+    <>
+      <div className="ebook-actions" style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-lg)' }}>
+        {fileType === 'pdf' && (
+          <Link 
+            href={`/biblioteca/ler/${ebookId}`}
+            className="btn btn-primary"
+            style={{ flex: 1, justifyContent: 'center' }}
+          >
+            📖 Ler Agora
+          </Link>
+        )}
+        <button
+          className="btn btn-secondary"
+          onClick={handleDownload}
+          disabled={downloading}
           style={{ flex: 1, justifyContent: 'center' }}
         >
-          📖 Ler Agora
-        </Link>
+          {downloading ? (
+            <><span className="spinner" style={{ marginRight: '8px' }} /> Baixando...</>
+          ) : (
+            '⬇️ Download'
+          )}
+        </button>
+        <button
+          className="btn btn-secondary"
+          onClick={() => setShowModal(true)}
+          style={{ flex: 1, justifyContent: 'center' }}
+          title="Adicionar à Playlist"
+        >
+          🗂️ Playlist
+        </button>
+      </div>
+
+      {showModal && (
+        <AddToPlaylistModal 
+          ebookId={ebookId} 
+          onClose={() => setShowModal(false)} 
+        />
       )}
-      <button
-        className="btn btn-secondary"
-        onClick={handleDownload}
-        disabled={downloading}
-        style={{ flex: 1, justifyContent: 'center' }}
-      >
-        {downloading ? (
-          <><span className="spinner" style={{ marginRight: '8px' }} /> Baixando...</>
-        ) : (
-          '⬇️ Fazer Download'
-        )}
-      </button>
-    </div>
+    </>
   )
 }
