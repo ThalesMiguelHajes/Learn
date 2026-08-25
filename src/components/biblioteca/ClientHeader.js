@@ -17,41 +17,27 @@ export default function ClientHeader({ profile }) {
 
   return (
     <header className="biblioteca-header">
-      <div className="biblioteca-header-logo" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div className="biblioteca-header-logo">
         <div>
           <span className="text-gradient">Koda</span>Books
         </div>
-        <div style={{ height: '24px', width: '1px', background: 'var(--border-default)' }}></div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.9 }}>
-          <img src="/scorpionbits-logo.png" alt="ScorpionBits Logo" style={{ width: '24px', height: '24px', filter: 'brightness(0) invert(1)' }} />
-          <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff', letterSpacing: '0.02em' }}>ScorpionBits</span>
+        <div className="biblioteca-header-divider"></div>
+        <div className="biblioteca-header-partner">
+          <img src="/scorpionbits-logo.png" alt="ScorpionBits Logo" className="partner-logo" />
+          <span className="partner-name">ScorpionBits</span>
         </div>
       </div>
 
-      <nav style={{ display: 'flex', gap: '8px', background: 'var(--bg-glass)', padding: '4px', borderRadius: 'var(--radius-full)' }}>
+      <nav className="biblioteca-header-nav">
         <a 
           href="/biblioteca" 
-          style={{ 
-            padding: '6px 16px', 
-            borderRadius: 'var(--radius-full)', 
-            fontSize: '0.875rem', 
-            fontWeight: 600,
-            background: pathname === '/biblioteca' ? 'var(--accent-gradient-soft)' : 'transparent',
-            color: pathname === '/biblioteca' ? 'var(--accent-secondary)' : 'var(--text-secondary)'
-          }}
+          className={`nav-link ${pathname === '/biblioteca' ? 'active' : ''}`}
         >
           Minha Biblioteca
         </a>
         <a 
           href="/biblioteca/catalogo" 
-          style={{ 
-            padding: '6px 16px', 
-            borderRadius: 'var(--radius-full)', 
-            fontSize: '0.875rem', 
-            fontWeight: 600,
-            background: pathname === '/biblioteca/catalogo' ? 'var(--accent-gradient-soft)' : 'transparent',
-            color: pathname === '/biblioteca/catalogo' ? 'var(--accent-secondary)' : 'var(--text-secondary)'
-          }}
+          className={`nav-link ${pathname === '/biblioteca/catalogo' ? 'active' : ''}`}
         >
           Catálogo
         </a>
@@ -59,12 +45,11 @@ export default function ClientHeader({ profile }) {
 
       <div className="biblioteca-header-right">
         <span className="biblioteca-header-user">
-          Olá, <strong style={{ color: 'var(--text-primary)' }}>{profile?.full_name?.split(' ')[0] || 'Usuário'}</strong>
+          Olá, <strong>{profile?.full_name?.split(' ')[0] || 'Usuário'}</strong>
         </span>
         <button 
-          className="btn btn-secondary btn-sm" 
+          className="btn btn-secondary btn-sm logout-btn" 
           onClick={handleLogout}
-          style={{ padding: '0.4rem 0.8rem', gap: '6px' }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
