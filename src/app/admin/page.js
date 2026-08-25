@@ -33,17 +33,14 @@ export default async function AdminDashboard() {
 
       <div className="stats-grid">
         <div className="glass-card stat-card" style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-          <div className="stat-icon" style={{ background: 'rgba(99, 102, 241, 0.2)', color: 'var(--accent-primary)' }}>💰</div>
+          <div className="stat-icon">💰</div>
           <div className="stat-value" style={{ color: 'var(--accent-primary)' }}>
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(totalRevenue)}
           </div>
-          <div className="stat-label">Faturamento</div>
-        </div>
-
-        <div className="glass-card stat-card">
-          <div className="stat-icon">📈</div>
-          <div className="stat-value">{totalVendas}</div>
-          <div className="stat-label">Vendas realizadas</div>
+          <div className="stat-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>Faturamento</span>
+            <span className="badge badge-accent">{totalVendas} venda{totalVendas !== 1 ? 's' : ''}</span>
+          </div>
         </div>
 
         <div className="glass-card stat-card">
