@@ -1,0 +1,296 @@
+'use client'
+
+import { useState, useRef } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { BUCKETS, MAX_FILE_SIZE, ACCEPTED_COVER_TYPES, ACCEPTED_EBOOK_TYPES } from '@/lib/constants'
+
+export default function NovoEbookPage() {
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [price, setPrice] = useState('')
+  const [coverFile, setCoverFile] = useState(null)
+  const [coverPreview, setCoverPreview] = useState(null)
+  const [ebookFile, setEbookFile] = useState(null)
+  const [isActive, setIsActive] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const coverInputRef = useRef(null)
+  const ebookInputRef = useRef(null)
+  const supabase = createClient()
+  const router = useRouter()
+
+  function handleCoverSelect(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!ACCEPTED_COVER_TYPES.includes(file.type)) {
+      setError('Formato de capa inválido. Use JPG, PNG ou WebP.')
+      return
+    }
+    if (file.size > MAX_FILE_SIZE.COVER) {
+      setError('A imagem de capa deve ter no máximo 5MB.')
+      return
+    }
+
+    setCoverFile(file)
+    setCoverPreview(URL.createObjectURL(file))
+    setError('')
+  }
+
+  function handleEbookSelect(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!ACCEPTED_EBOOK_TYPES.includes(file.type)) {
+      setError('Formato de arquivo inválido. Use PDF ou ePub.')
+      return
+    }
+    if (file.size > MAX_FILE_SIZE.EBOOK) {
+      setError('O arquivo do e-book deve ter no máximo 50MB.')
+      return
+    }
+
+    setEbookFile(file)
+    setError('')
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError('')
+
+    if (!coverFile) {
+      setError('Selecione uma imagem de capa.')
+      return
+    }
+    if (!ebookFile) {
+      setError('Selecione o arquivo do e-book (PDF ou ePub).')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const timestamp = Date.now()
+      const coverExt = coverFile.name.split('.').pop()
+      const coverPath = `${timestamp}-${Math.random().toString(36).substring(7)}.${coverExt}`
+
+      // Upload cover
+      const { error: coverError } = await supabase.storage
+        .from(BUCKETS.COVERS)
+        .upload(coverPath, coverFile)
+
+      if (coverError) throw new Error('Erro ao enviar capa: ' + coverError.message)
+
+      // Get public URL for cover
+      const { data: coverUrlData } = supabase.storage
+        .from(BUCKETS.COVERS)
+        .getPublicUrl(coverPath)
+
+      // Upload ebook file
+      const ebookExt = ebookFile.name.split('.').pop()
+      const ebookPath = `${timestamp}-${Math.random().toString(36).substring(7)}.${ebookExt}`
+
+      const { error: ebookError } = await supabase.storage
+        .from(BUCKETS.EBOOKS)
+        .upload(ebookPath, ebookFile)
+
+      if (ebookError) throw new Error('Erro ao enviar arquivo: ' + ebookError.message)
+
+      // Insert ebook record
+      const { error: dbError } = await supabase.from('ebooks').insert({
+        title,
+        description,
+        price: parseFloat(price) || 0,
+        cover_url: coverUrlData.publicUrl,
+        file_path: ebookPath,
+        file_name: ebookFile.name,
+        file_type: ebookExt.toLowerCase() === 'epub' ? 'epub' : 'pdf',
+        is_active: isActive,
+      })
+
+      if (dbError) throw new Error('Erro ao salvar: ' + dbError.message)
+
+      router.push('/admin/ebooks')
+      router.refresh()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
+      <div className="page-header">
+        <div className="page-header-left">
+          <h1>Novo E-book</h1>
+          <p>Adicione um novo livro digital à plataforma</p>
+        </div>
+      </div>
+
+      <div className="glass-card" style={{ padding: 'var(--space-2xl)', maxWidth: '720px' }}>
+        <form onSubmit={handleSubmit} id="ebook-form">
+          {error && (
+            <div style={{
+              padding: 'var(--space-md)',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--error-soft)',
+              color: 'var(--error)',
+              fontSize: '0.875rem',
+              borderLeft: '3px solid var(--error)',
+              marginBottom: 'var(--space-lg)',
+            }}>
+              {error}
+            </div>
+          )}
+
+          <div className="form-group mb-lg">
+            <label htmlFor="title" className="form-label">Título *</label>
+            <input
+              id="title"
+              type="text"
+              className="form-input"
+              placeholder="Nome do e-book"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group mb-lg">
+            <label htmlFor="description" className="form-label">Descrição</label>
+            <textarea
+              id="description"
+              className="form-input form-textarea"
+              placeholder="Descreva o conteúdo do e-book..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group mb-lg">
+            <label htmlFor="price" className="form-label">Preço (R$)</label>
+            <input
+              id="price"
+              type="number"
+              step="0.01"
+              min="0"
+              className="form-input"
+              placeholder="0.00"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              style={{ maxWidth: '200px' }}
+            />
+          </div>
+
+          <div className="form-group mb-lg">
+            <label className="form-label">Imagem de Capa *</label>
+            <div className="file-upload" onClick={() => coverInputRef.current?.click()}>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp"
+                onChange={handleCoverSelect}
+                style={{ display: 'none' }}
+              />
+              <div className="upload-icon">🖼️</div>
+              <div className="upload-text">
+                Clique para selecionar ou <strong>arraste a imagem</strong>
+              </div>
+              <div className="upload-hint">JPG, PNG ou WebP — Máx. 5MB</div>
+            </div>
+            {coverPreview && (
+              <div className="file-preview">
+                <img src={coverPreview} alt="Preview" className="file-preview-image" />
+                <div className="file-preview-info">
+                  <div className="file-preview-name">{coverFile?.name}</div>
+                  <div className="file-preview-size">{formatFileSize(coverFile?.size)}</div>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => { setCoverFile(null); setCoverPreview(null) }}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="form-group mb-lg">
+            <label className="form-label">Arquivo do E-book (PDF / ePub) *</label>
+            <div className="file-upload" onClick={() => ebookInputRef.current?.click()}>
+              <input
+                ref={ebookInputRef}
+                type="file"
+                accept=".pdf,.epub"
+                onChange={handleEbookSelect}
+                style={{ display: 'none' }}
+              />
+              <div className="upload-icon">📄</div>
+              <div className="upload-text">
+                Clique para selecionar ou <strong>arraste o arquivo</strong>
+              </div>
+              <div className="upload-hint">PDF ou ePub — Máx. 50MB</div>
+            </div>
+            {ebookFile && (
+              <div className="file-preview">
+                <div style={{ width: '60px', height: '80px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0 }}>
+                  📄
+                </div>
+                <div className="file-preview-info">
+                  <div className="file-preview-name">{ebookFile.name}</div>
+                  <div className="file-preview-size">{formatFileSize(ebookFile.size)}</div>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setEbookFile(null)}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="form-group mb-xl">
+            <label className="checkbox-item" style={{ padding: 0 }}>
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+              />
+              <span>E-book ativo (visível para clientes atribuídos)</span>
+            </label>
+          </div>
+
+          <div className="flex gap-md">
+            <button
+              type="submit"
+              className="btn btn-primary btn-lg"
+              disabled={loading}
+              id="ebook-submit"
+            >
+              {loading ? <><span className="spinner" /> Salvando...</> : '📚 Criar E-book'}
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-lg"
+              onClick={() => router.push('/admin/ebooks')}
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
+  )
+}
