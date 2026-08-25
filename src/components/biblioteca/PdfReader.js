@@ -91,13 +91,9 @@ export default function PdfReader({ ebookId }) {
         </div>
 
         <div className="toolbar-group pagination-group">
-          <button className="btn-icon" disabled={pageNumber <= 1} onClick={previousPage} title="Página Anterior">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-          </button>
-          <span className="page-indicator">{pageNumber} de {numPages || '--'}</span>
-          <button className="btn-icon" disabled={pageNumber >= (numPages || 1)} onClick={nextPage} title="Próxima Página">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </button>
+          <span className="page-indicator">
+            {numPages ? `${numPages} páginas` : '--'}
+          </span>
         </div>
 
         <div className="toolbar-group">
@@ -133,17 +129,21 @@ export default function PdfReader({ ebookId }) {
               </div>
             }
           >
-            <Page 
-              pageNumber={pageNumber} 
-              scale={scale} 
-              renderTextLayer={true}
-              renderAnnotationLayer={true}
-              loading={
-                <div className="pdf-page-loading">
-                  <span className="spinner"></span>
-                </div>
-              }
-            />
+            {numPages && Array.from(new Array(numPages), (el, index) => (
+              <div key={`page_${index + 1}`} className="pdf-page-wrapper">
+                <Page 
+                  pageNumber={index + 1} 
+                  scale={scale} 
+                  renderTextLayer={true}
+                  renderAnnotationLayer={true}
+                  loading={
+                    <div className="pdf-page-loading">
+                      <span className="spinner"></span>
+                    </div>
+                  }
+                />
+              </div>
+            ))}
           </Document>
         )}
       </div>
