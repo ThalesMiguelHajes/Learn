@@ -11,6 +11,7 @@ export default function AdminSidebar({ profile }) {
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: '📊' },
+    { href: '/admin/vendas', label: 'Vendas', icon: '💰' },
     { href: '/admin/ebooks', label: 'E-books', icon: '📚' },
     { href: '/admin/usuarios', label: 'Usuários', icon: '👥' },
     { href: '/admin/atribuicoes', label: 'Atribuições', icon: '🔗' },
