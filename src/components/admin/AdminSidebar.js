@@ -34,10 +34,16 @@ export default function AdminSidebar({ profile }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <span className="sidebar-logo">
-          <span className="text-gradient">Koda</span>Books
-        </span>
-        <span className="sidebar-badge">Admin</span>
+        <div>
+          <span className="sidebar-logo">
+            <span className="text-gradient">Koda</span>Books
+          </span>
+          <span className="sidebar-badge">Admin</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', opacity: 0.9 }}>
+          <img src="/scorpionbits-logo.png" alt="ScorpionBits Logo" style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} />
+          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff', letterSpacing: '0.02em', textTransform: 'uppercase' }}>ScorpionBits</span>
+        </div>
       </div>
 
       <nav className="sidebar-nav">
@@ -63,12 +69,16 @@ export default function AdminSidebar({ profile }) {
           </div>
         </div>
         <button
-          className="sidebar-link w-full"
+          className="btn btn-secondary w-full"
           onClick={handleLogout}
-          style={{ border: 'none', background: 'none', cursor: 'pointer', width: '100%', marginTop: '4px' }}
+          style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}
         >
-          <span className="icon">🚪</span>
-          Sair
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8 }}>
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Sair do Painel
         </button>
       </div>
     </aside>

@@ -8,15 +8,16 @@ export default async function BibliotecaPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Fetch only ebooks assigned to this user
-  const { data: ebooks, error } = await supabase
-    .from('ebooks')
-    .select('*')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
+  // Fetch only ebooks assigned to this user via the user_ebooks table
+  const { data: userEbooks, error } = await supabase
+    .from('user_ebooks')
+    .select('ebooks(*)')
+    .eq('user_id', user.id)
 
-  // The RLS policy already filters to only show ebooks the user owns
-  // via the user_ebooks relationship
+  const ebooks = userEbooks
+    ?.map((ue) => ue.ebooks)
+    .filter((e) => e && e.is_active)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) || []
 
   return (
     <>
