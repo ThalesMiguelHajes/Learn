@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 export default function EbookCard({ ebook, index }) {
   const [downloading, setDownloading] = useState(false)
@@ -62,20 +63,33 @@ export default function EbookCard({ ebook, index }) {
         {ebook.description && (
           <p className="ebook-card-desc">{ebook.description}</p>
         )}
-        <div className="ebook-card-footer">
+        <div className="ebook-card-footer" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           {ebook.file_type && (
-            <span className="badge badge-info">{ebook.file_type.toUpperCase()}</span>
+            <span className="badge badge-info" style={{ marginRight: 'auto' }}>
+              {ebook.file_type.toUpperCase()}
+            </span>
+          )}
+          {ebook.file_type === 'pdf' && (
+            <Link 
+              href={`/biblioteca/ler/${ebook.id}`}
+              className="btn btn-primary btn-sm"
+              style={{ padding: '0.4rem 0.8rem' }}
+            >
+              📖 Ler
+            </Link>
           )}
           <button
-            className="btn btn-primary btn-sm"
+            className="btn btn-secondary btn-sm"
             onClick={handleDownload}
             disabled={downloading}
             id={`download-${ebook.id}`}
+            style={{ padding: '0.4rem 0.8rem' }}
+            title="Baixar Arquivo"
           >
             {downloading ? (
-              <><span className="spinner" /> Baixando...</>
+              <span className="spinner spinner-sm" />
             ) : (
-              '⬇️ Baixar'
+              '⬇️'
             )}
           </button>
         </div>
