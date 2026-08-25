@@ -1538,17 +1538,110 @@ h4 { font-size: 1.125rem; }
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
   background: var(--border-default);
-  border-radius: var(--radius-full);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--border-strong);
+/* ============================================================
+   LIVRO DETAILS PAGE
+   ============================================================ */
+
+.livro-details-page {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.livro-details-layout {
+  display: flex;
+  gap: var(--space-xl);
+  padding: var(--space-xl);
+  align-items: flex-start;
+}
+
+.livro-cover-large {
+  flex: 0 0 300px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  background: var(--bg-tertiary);
+  aspect-ratio: 2 / 3;
+}
+
+.livro-cover-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  width: 100%;
+  height: 100%;
+}
+
+.livro-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.livro-info h1 {
+  font-size: 2.5rem;
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-md);
+  background: var(--text-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.livro-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+
+@media (max-width: 768px) {
+  .livro-details-layout {
+    flex-direction: column;
+    padding: var(--space-lg);
+    gap: var(--space-lg);
+  }
+
+  .livro-cover-large {
+    flex: 0 0 auto;
+    width: 200px;
+    margin: 0 auto;
+  }
+
+  .livro-info h1 {
+    font-size: 2rem;
+    text-align: center;
+  }
+  
+  .livro-info .badge {
+    align-self: center;
+  }
+
+  .livro-description {
+    text-align: center;
+  }
+  
+  .ebook-actions {
+    flex-direction: column;
+  }
 }
