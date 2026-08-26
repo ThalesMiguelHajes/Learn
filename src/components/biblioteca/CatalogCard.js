@@ -1,21 +1,51 @@
 'use client'
 
-export default function CatalogCard({ ebook, index }) {
-  const whatsappNumber = '5516996004393'
-  const message = `Olá! Queria adquirir o E-book: ${ebook.title}`
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
-  // Format price
+export default function CatalogCard({ ebook, index, hasEbook = false }) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const router = useRouter()
+
   const priceFormatted = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
   }).format(ebook.price || 0)
 
+  async function handleBuy() {
+    if (hasEbook) {
+      router.push(`/biblioteca/livro/${ebook.id}`)
+      return
+    }
+
+    setLoading(true)
+    // Redireciona para a página de checkout para coletar CPF e Telefone
+    router.push(`/biblioteca/checkout/${ebook.id}`)
+  }
+
   return (
     <div
       className="glass-card ebook-card animate-in"
-      style={{ animationDelay: `${index * 80}ms` }}
+      style={{ animationDelay: `${index * 80}ms`, position: 'relative' }}
     >
+      {hasEbook && (
+        <div style={{
+          position: 'absolute',
+          top: 'var(--space-sm)',
+          right: 'var(--space-sm)',
+          background: 'var(--success)',
+          color: '#fff',
+          padding: '4px 8px',
+          borderRadius: 'var(--radius-sm)',
+          fontSize: '0.75rem',
+          fontWeight: 'bold',
+          zIndex: 2,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+        }}>
+          ✅ Na Biblioteca
+        </div>
+      )}
       {ebook.cover_url ? (
         <img
           src={ebook.cover_url}
@@ -38,16 +68,29 @@ export default function CatalogCard({ ebook, index }) {
         {ebook.description && (
           <p className="ebook-card-desc">{ebook.description}</p>
         )}
+
+        {error && (
+          <p style={{
+            fontSize: '0.78rem',
+            color: 'var(--error, #f87171)',
+            marginBottom: 'var(--space-xs)',
+            lineHeight: 1.4,
+          }}>
+            {error}
+          </p>
+        )}
+
         <div className="ebook-card-footer">
-          <span className="ebook-card-price">{priceFormatted}</span>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary btn-sm"
+          <span className="ebook-card-price">{hasEbook ? 'Adquirido' : priceFormatted}</span>
+          <button
+            id={`buy-ebook-${ebook.id}`}
+            onClick={handleBuy}
+            disabled={loading}
+            className={`btn ${hasEbook ? 'btn-secondary' : 'btn-primary'} btn-sm`}
+            style={{ opacity: loading ? 0.7 : 1, cursor: loading ? 'wait' : 'pointer' }}
           >
-            🛒 Comprar
-          </a>
+            {loading ? '⏳ Aguarde...' : (hasEbook ? '📖 Ler' : '🛒 Comprar')}
+          </button>
         </div>
       </div>
     </div>

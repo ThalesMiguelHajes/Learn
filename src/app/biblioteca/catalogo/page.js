@@ -11,6 +11,8 @@ export default async function CatalogoPage({ searchParams }) {
   const { q } = await searchParams || {}
   const supabase = await createClient()
 
+  const { data: { user } } = await supabase.auth.getUser()
+  
   let query = supabase
     .from('ebooks')
     .select('*')
@@ -22,6 +24,19 @@ export default async function CatalogoPage({ searchParams }) {
   }
 
   const { data: ebooks, error } = await query
+
+  // Buscar os e-books que o usuário já possui
+  let ownedEbookIds = []
+  if (user) {
+    const { data: userEbooks } = await supabase
+      .from('user_ebooks')
+      .select('ebook_id')
+      .eq('user_id', user.id)
+    
+    if (userEbooks) {
+      ownedEbookIds = userEbooks.map(ue => ue.ebook_id)
+    }
+  }
 
   return (
     <div className="biblioteca-page">
@@ -56,9 +71,12 @@ export default async function CatalogoPage({ searchParams }) {
         </div>
       ) : (
         <div className="ebook-grid">
-          {ebooks.map((ebook, idx) => (
-            <CatalogCard key={ebook.id} ebook={ebook} index={idx} />
-          ))}
+          {ebooks.map((ebook, idx) => {
+            const hasEbook = ownedEbookIds.includes(ebook.id)
+            return (
+              <CatalogCard key={ebook.id} ebook={ebook} index={idx} hasEbook={hasEbook} />
+            )
+          })}
         </div>
       )}
     </div>
