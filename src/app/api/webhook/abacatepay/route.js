@@ -11,9 +11,11 @@ export async function POST(request) {
     const receivedSecret = searchParams.get('webhookSecret')
     const expectedSecret = process.env.ABACATEPAY_WEBHOOK_SECRET
 
-    if (!expectedSecret || receivedSecret !== expectedSecret) {
-      console.warn('Webhook recebido com secret inválido.')
+    if (expectedSecret && receivedSecret !== expectedSecret) {
+      console.warn('Webhook recebido com secret inválido. Esperado:', expectedSecret, 'Recebido:', receivedSecret)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    } else if (!expectedSecret) {
+      console.warn('Atenção: ABACATEPAY_WEBHOOK_SECRET não está configurado. Webhook aceito sem validação de segurança.')
     }
 
     // 2. Ler o payload do evento
@@ -24,7 +26,8 @@ export async function POST(request) {
     console.log(`[AbacatePay Webhook] Evento: ${event}`, { devMode, billingId: data?.id })
 
     // 3. Só processar o evento de pagamento confirmado
-    if (event !== 'billing.paid') {
+    const eventName = (event || '').toUpperCase()
+    if (eventName !== 'BILLING.PAID') {
       // Responde 200 para outros eventos (evita retry desnecessário)
       return NextResponse.json({ received: true, processed: false })
     }
