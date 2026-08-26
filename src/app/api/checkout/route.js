@@ -69,7 +69,10 @@ export async function POST(request) {
     const customerPhone = profile?.phone || phone
 
     // 4. Criar cobrança na AbacatePay via REST
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const origin = request.headers.get('origin')
+    const host = request.headers.get('host')
+    const protocol = request.headers.get('x-forwarded-proto') || 'http'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || origin || (host ? `${protocol}://${host}` : 'http://localhost:3000')
 
     const abacateResponse = await fetch('https://api.abacatepay.com/v1/billing/create', {
       method: 'POST',
