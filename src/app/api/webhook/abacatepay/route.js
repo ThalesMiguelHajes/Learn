@@ -27,7 +27,7 @@ export async function POST(request) {
 
     // 3. Só processar o evento de pagamento confirmado
     const eventName = (event || '').toUpperCase()
-    if (eventName !== 'BILLING.PAID') {
+    if (eventName !== 'BILLING.PAID' && eventName !== 'CHECKOUT.COMPLETED') {
       // Responde 200 para outros eventos (evita retry desnecessário)
       return NextResponse.json({ received: true, processed: false })
     }
