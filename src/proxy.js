@@ -58,16 +58,16 @@ export async function proxy(request) {
     }
   }
 
-  // Redirect root to login
+  // Handle root path: redirect authenticated users to their dashboard, 
+  // but allow unauthenticated users to see the Landing Page
   if (pathname === '/') {
     if (user && role) {
       const url = request.nextUrl.clone()
       url.pathname = role === ROLES.ADMIN ? '/admin' : '/biblioteca'
       return NextResponse.redirect(url)
     }
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+    // Allow pass-through for unauthenticated users to see the landing page
+    return supabaseResponse
   }
 
   return supabaseResponse
