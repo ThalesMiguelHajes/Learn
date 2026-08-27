@@ -59,8 +59,13 @@ export default function Footer() {
 
         {/* Legal Column */}
         <div>
-          <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-primary)' }}>Legal</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-primary)' }}>Legal e Contato</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+            <li>
+              <a href="mailto:scorpionbits.contato@gmail.com" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }}>
+                Contato
+              </a>
+            </li>
             <li>
               <a href="#" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }}>
                 Termos de Uso
