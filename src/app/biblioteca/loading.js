@@ -1,7 +1,9 @@
+import Image from 'next/image'
+
 export default function Loading() {
   return (
     <div className="loading-page">
-      <img src="/scorpionbits-logo.png" alt="Carregando..." className="loading-logo-pulse" />
+      <Image src="/scorpionbits-logo.png" alt="Carregando..." width={60} height={60} className="loading-logo-pulse" priority />
     </div>
   )
 }

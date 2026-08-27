@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { IconBookOpen } from '@/components/icons'
 
 export default function EbookCard({ ebook, index }) {
@@ -11,11 +12,14 @@ export default function EbookCard({ ebook, index }) {
       style={{ animationDelay: `${index * 80}ms` }}
     >
       {ebook.cover_url ? (
-        <img
-          src={ebook.cover_url}
-          alt={`Capa de ${ebook.title}`}
-          className="ebook-card-cover"
-        />
+        <div className="ebook-card-cover">
+          <Image
+            src={ebook.cover_url}
+            alt={`Capa de ${ebook.title}`}
+            fill
+            sizes="(max-width: 768px) 45vw, 220px"
+          />
+        </div>
       ) : (
         <div className="ebook-card-cover ebook-card-cover-placeholder">
           <IconBookOpen size={40} />

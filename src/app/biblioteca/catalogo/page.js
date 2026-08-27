@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import CatalogCard from '@/components/biblioteca/CatalogCard'
 import SearchBar from '@/components/biblioteca/SearchBar'
 import { Suspense } from 'react'
+import Image from 'next/image'
 import { IconSearch } from '@/components/icons'
 
 export const metadata = {
@@ -48,7 +49,7 @@ export default async function CatalogoPage({ searchParams }) {
         </div>
       </div>
       
-      <Suspense fallback={<div className="loading-page" style={{minHeight: '40vh'}}><img src="/scorpionbits-logo.png" alt="Carregando" className="loading-logo-pulse" /></div>}>
+      <Suspense fallback={<div className="loading-page" style={{minHeight: '40vh'}}><Image src="/scorpionbits-logo.png" alt="Carregando" width={60} height={60} className="loading-logo-pulse" /></div>}>
         <SearchBar placeholder="Buscar no catálogo..." />
       </Suspense>
 

@@ -1366,11 +1366,16 @@ h4 { font-size: 1.125rem; }
 }
 
 .ebook-card-cover {
+  position: relative;
   width: 100%;
   aspect-ratio: 3 / 4;
-  object-fit: cover;
   background: var(--bg-tertiary);
   display: block;
+  overflow: hidden;
+}
+
+.ebook-card-cover img {
+  object-fit: cover;
 }
 
 .ebook-card-body {
@@ -1944,6 +1949,7 @@ h4 { font-size: 1.125rem; }
 }
 
 .livro-cover-large {
+  position: relative;
   flex: 0 0 300px;
   border-radius: var(--radius-lg);
   overflow: hidden;

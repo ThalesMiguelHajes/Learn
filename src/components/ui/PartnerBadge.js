@@ -1,12 +1,15 @@
+import Image from 'next/image'
+
 export default function PartnerBadge({ label, size = 20 }) {
   return (
     <div className="partner-badge">
       {label && <span className="partner-badge-label">{label}</span>}
-      <img
+      <Image
         src="/scorpionbits-logo.png"
         alt="ScorpionBits"
+        width={size}
+        height={size}
         className="partner-badge-logo"
-        style={{ width: size, height: size }}
       />
       <span className="partner-badge-name">ScorpionBits</span>
     </div>

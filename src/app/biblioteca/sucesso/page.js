@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import AutoRefresh from '@/components/biblioteca/AutoRefresh'
 import { IconCheckCircle, IconClock, IconBookOpen } from '@/components/icons'
@@ -63,7 +64,7 @@ export default async function SucessoPage({ searchParams }) {
 
         {ebook?.cover_url && (
           <div className="status-cover" style={{ opacity: isPaid ? 1 : 0.5 }}>
-            <img src={ebook.cover_url} alt={`Capa de ${ebook.title}`} />
+            <Image src={ebook.cover_url} alt={`Capa de ${ebook.title}`} width={120} height={160} />
           </div>
         )}
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export default function CheckoutClient({ ebook, userProfile }) {
   const [cpf, setCpf] = useState(userProfile?.cpf || '')
@@ -99,7 +100,7 @@ export default function CheckoutClient({ ebook, userProfile }) {
 
         <div className="checkout-summary-item">
           {ebook.cover_url ? (
-            <img src={ebook.cover_url} alt={ebook.title} className="checkout-cover" />
+            <Image src={ebook.cover_url} alt={ebook.title} width={80} height={110} className="checkout-cover" />
           ) : (
             <div className="checkout-cover" style={{ background: 'var(--bg-tertiary)' }} />
           )}

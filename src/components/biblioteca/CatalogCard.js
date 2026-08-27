@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { IconCheckCircle, IconBookOpen, IconCart, IconDevices } from '@/components/icons'
 
 export default function CatalogCard({ ebook, index, hasEbook = false }) {
@@ -36,11 +37,14 @@ export default function CatalogCard({ ebook, index, hasEbook = false }) {
         </div>
       )}
       {ebook.cover_url ? (
-        <img
-          src={ebook.cover_url}
-          alt={`Capa de ${ebook.title}`}
-          className="ebook-card-cover"
-        />
+        <div className="ebook-card-cover">
+          <Image
+            src={ebook.cover_url}
+            alt={`Capa de ${ebook.title}`}
+            fill
+            sizes="(max-width: 768px) 45vw, 220px"
+          />
+        </div>
       ) : (
         <div className="ebook-card-cover ebook-card-cover-placeholder">
           <IconDevices size={40} />

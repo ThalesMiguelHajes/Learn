@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/auth'
 import Pagination from '@/components/ui/Pagination'
+import Image from 'next/image'
 import { IconBookOpen, IconLink } from '@/components/icons'
 
 const PAGE_SIZE = 25
@@ -61,7 +62,7 @@ export default async function AtribuicoesPage({ searchParams }) {
                     <td>
                       <div className="flex items-center gap-md">
                         {a.ebooks?.cover_url ? (
-                          <img src={a.ebooks.cover_url} alt="" className="table-thumbnail-sm" />
+                          <Image src={a.ebooks.cover_url} alt="" width={32} height={42} className="table-thumbnail-sm" />
                         ) : (
                           <div className="table-thumbnail-sm flex items-center justify-center">
                             <IconBookOpen size={16} />

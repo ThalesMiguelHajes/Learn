@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createServiceClient } from '@/lib/supabase/server'
 import Footer from '@/components/Footer'
 import Reveal from '@/components/Reveal'
@@ -101,11 +102,14 @@ export default async function LandingPage() {
                       style={{ animationDelay: `${index * 80}ms` }}
                     >
                       {ebook.cover_url ? (
-                        <img
-                          src={ebook.cover_url}
-                          alt={`Capa de ${ebook.title}`}
-                          className="ebook-card-cover"
-                        />
+                        <div className="ebook-card-cover">
+                          <Image
+                            src={ebook.cover_url}
+                            alt={`Capa de ${ebook.title}`}
+                            fill
+                            sizes="(max-width: 768px) 45vw, 280px"
+                          />
+                        </div>
                       ) : (
                         <div className="ebook-card-cover ebook-card-cover-placeholder">
                           <IconDevices size={40} />

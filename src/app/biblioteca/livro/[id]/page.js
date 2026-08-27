@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import EbookActions from '@/components/biblioteca/EbookActions'
 import { IconArrowLeft, IconBookOpen } from '@/components/icons'
 
@@ -82,7 +83,7 @@ export default async function DetalhesLivroPage({ params }) {
       <div className="glass-card livro-details-layout">
         <div className="livro-cover-large">
           {ebook.cover_url ? (
-            <img src={ebook.cover_url} alt={`Capa de ${ebook.title}`} />
+            <Image src={ebook.cover_url} alt={`Capa de ${ebook.title}`} fill style={{ objectFit: 'cover' }} sizes="300px" priority />
           ) : (
             <div className="cover-placeholder"><IconBookOpen size={48} /></div>
           )}
@@ -102,11 +103,9 @@ export default async function DetalhesLivroPage({ params }) {
             )}
           </div>
           
-          <EbookActions 
-            ebookId={ebook.id} 
-            fileType={ebook.file_type} 
-            title={ebook.title}
-            fileName={ebook.file_name} 
+          <EbookActions
+            ebookId={ebook.id}
+            fileType={ebook.file_type}
           />
         </div>
       </div>

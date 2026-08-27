@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Avatar from '@/components/ui/Avatar'
 import Modal from '@/components/ui/Modal'
 import { IconArrowLeft, IconPlus, IconTrash, IconBookOpen, IconBooks } from '@/components/icons'
@@ -180,7 +181,7 @@ export default function GerenciarEbooksUsuario({ params }) {
                 <tr key={assignment.id}>
                   <td>
                     {assignment.ebooks?.cover_url ? (
-                      <img src={assignment.ebooks.cover_url} alt="" className="table-thumbnail" />
+                      <Image src={assignment.ebooks.cover_url} alt="" width={48} height={64} className="table-thumbnail" />
                     ) : (
                       <div className="table-thumbnail flex items-center justify-center">
                         <IconBookOpen size={18} />
@@ -250,7 +251,7 @@ export default function GerenciarEbooksUsuario({ params }) {
                     />
                     <div className="flex items-center gap-md" style={{ flex: 1 }}>
                       {ebook.cover_url ? (
-                        <img src={ebook.cover_url} alt="" className="table-thumbnail-sm" />
+                        <Image src={ebook.cover_url} alt="" width={32} height={42} className="table-thumbnail-sm" />
                       ) : (
                         <div className="table-thumbnail-sm flex items-center justify-center">
                           <IconBookOpen size={16} />

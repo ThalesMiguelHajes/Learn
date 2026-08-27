@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { IconEdit, IconTrash, IconBookOpen } from '@/components/icons'
@@ -56,7 +57,7 @@ export default function EbooksTable({ ebooks }) {
               <tr key={ebook.id}>
                 <td>
                   {ebook.cover_url ? (
-                    <img src={ebook.cover_url} alt="" className="table-thumbnail" />
+                    <Image src={ebook.cover_url} alt="" width={48} height={64} className="table-thumbnail" />
                   ) : (
                     <div className="table-thumbnail flex items-center justify-center">
                       <IconBookOpen size={18} />
