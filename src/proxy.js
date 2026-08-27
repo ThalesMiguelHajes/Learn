@@ -6,18 +6,32 @@ export async function proxy(request) {
   const { user, supabase, supabaseResponse } = await updateSession(request)
   const { pathname } = request.nextUrl
 
-  // If user is logged in, get their role
-  let role = null
+  // If user is logged in, get their role (use cookie to avoid DB call on every request)
+  let role = request.cookies.get('user_role')?.value
+
   if (user) {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-    role = profile?.role
-    console.log('[PROXY] User ID:', user.id, 'Role fetched:', role, 'Error:', error)
+    if (!role) {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      role = profile?.role
+      
+      if (role) {
+        supabaseResponse.cookies.set('user_role', role, {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+        })
+      }
+      console.log('[PROXY] Fetched role from DB:', role)
+    }
   } else {
-    console.log('[PROXY] No user found in session')
+    // If no user but cookie exists, clear it
+    if (role) {
+      supabaseResponse.cookies.delete('user_role')
+      role = null
+    }
   }
 
   // Protect /admin routes — require admin role
