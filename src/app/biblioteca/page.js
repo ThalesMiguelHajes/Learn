@@ -1,15 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
+import { requireAuth } from '@/lib/auth'
 import EbookCard from '@/components/biblioteca/EbookCard'
 import Link from 'next/link'
 import { IconBooks, IconBookOpen, IconFolder } from '@/components/icons'
 
 export default async function BibliotecaPage({ searchParams }) {
   const { tab = 'livros' } = await searchParams || {}
+  const { user } = await requireAuth()
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
 
   // Fetch ebooks
   const { data: userEbooks } = await supabase

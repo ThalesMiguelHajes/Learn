@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/auth'
 import CheckoutClient from '@/components/biblioteca/CheckoutClient'
 
 export const metadata = {
@@ -14,13 +15,8 @@ export default async function CheckoutPage({ params }) {
     redirect('/biblioteca')
   }
 
+  const { user } = await requireAuth()
   const supabase = await createClient()
-
-  // 1. Verificar se usuário está logado
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    redirect('/login')
-  }
 
   // 2. Buscar o e-book
   const { data: ebook } = await supabase

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import PdfReader from '@/components/biblioteca/PdfReader'
-import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/auth'
 import { IconBookOpen } from '@/components/icons'
 
 export async function generateMetadata({ params }) {
@@ -20,16 +20,8 @@ export async function generateMetadata({ params }) {
 
 export default async function LerEbookPage({ params }) {
   const { id } = await params
+  const { user } = await requireAuth()
   const supabase = await createClient()
-
-  // Authenticate user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
 
   // Verify ownership
   const { data: ownership } = await supabase

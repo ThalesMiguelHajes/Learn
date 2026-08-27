@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
 export async function createPlaylist(title) {
@@ -8,13 +9,13 @@ export async function createPlaylist(title) {
     return { error: 'O título da playlist é obrigatório.' }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getUser()
 
   if (!user) {
     return { error: 'Usuário não autenticado.' }
   }
 
+  const supabase = await createClient()
   const { data, error } = await supabase
     .from('playlists')
     .insert([{ user_id: user.id, title: title.trim() }])
@@ -31,13 +32,13 @@ export async function createPlaylist(title) {
 }
 
 export async function addEbookToPlaylist(playlistId, ebookId) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getUser()
 
   if (!user) {
     return { error: 'Usuário não autenticado.' }
   }
 
+  const supabase = await createClient()
   const { data: playlist } = await supabase
     .from('playlists')
     .select('id')
@@ -68,12 +69,13 @@ export async function addEbookToPlaylist(playlistId, ebookId) {
 }
 
 export async function getUserPlaylists() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getUser()
 
   if (!user) {
     return { error: 'Usuário não autenticado.', data: [] }
   }
+
+  const supabase = await createClient()
 
   // Fetch playlists along with the count of ebooks inside them (optional, but good for UI)
   const { data, error } = await supabase

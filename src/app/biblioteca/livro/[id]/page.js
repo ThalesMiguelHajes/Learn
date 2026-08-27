@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/auth'
 import Link from 'next/link'
 import Image from 'next/image'
 import EbookActions from '@/components/biblioteca/EbookActions'
@@ -22,15 +22,8 @@ export async function generateMetadata({ params }) {
 
 export default async function DetalhesLivroPage({ params }) {
   const { id } = await params
+  const { user } = await requireAuth()
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
 
   // Verificar se o usuário possui este e-book
   const { data: ownership } = await supabase

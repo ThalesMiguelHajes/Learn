@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/auth'
 import Link from 'next/link'
 import EbookCard from '@/components/biblioteca/EbookCard'
 import { IconArrowLeft, IconFolder } from '@/components/icons'
@@ -21,15 +21,8 @@ export async function generateMetadata({ params }) {
 
 export default async function PlaylistPage({ params }) {
   const { id } = await params
+  const { user } = await requireAuth()
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
 
   // Buscar detalhes da playlist verificando propriedade (RLS handles this but we enforce query)
   const { data: playlist } = await supabase

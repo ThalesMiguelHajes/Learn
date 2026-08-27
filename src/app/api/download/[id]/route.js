@@ -1,22 +1,20 @@
-import { createClient } from '@/lib/supabase/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/auth'
 
 export async function GET(request, { params }) {
   const { id } = await params
 
   // 1. Verify authentication
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
+  const { user } = await getUser()
 
-  if (authError || !user) {
+  if (!user) {
     return Response.json(
       { error: 'Não autorizado. Faça login para continuar.' },
       { status: 401 }
     )
   }
+
+  const supabase = await createClient()
 
   // 2. Verify ownership — check if user has this ebook assigned
   const { data: ownership, error: ownershipError } = await supabase

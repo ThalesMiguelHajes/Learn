@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/auth'
 import AutoRefresh from '@/components/biblioteca/AutoRefresh'
 import { IconCheckCircle, IconClock, IconBookOpen } from '@/components/icons'
 
@@ -16,13 +17,8 @@ export default async function SucessoPage({ searchParams }) {
     redirect('/biblioteca')
   }
 
+  const { user } = await requireAuth()
   const supabase = await createClient()
-
-  // 1. Verificar se o usuário está autenticado
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    redirect('/login')
-  }
 
   // 2. Buscar dados do e-book
   const { data: ebook } = await supabase

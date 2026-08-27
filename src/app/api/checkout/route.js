@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 
 // POST /api/checkout
@@ -27,10 +28,10 @@ export async function POST(request) {
     }
 
     // 1. Autenticar o usuário via sessão (cookie SSR)
+    const { user } = await getUser()
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Você precisa estar logado para comprar.' }, { status: 401 })
     }
 

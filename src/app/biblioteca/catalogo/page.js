@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/auth'
 import CatalogCard from '@/components/biblioteca/CatalogCard'
 import SearchBar from '@/components/biblioteca/SearchBar'
 import { Suspense } from 'react'
@@ -13,8 +14,8 @@ export default async function CatalogoPage({ searchParams }) {
   const { q } = await searchParams || {}
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  
+  const { user } = await getUser()
+
   let query = supabase
     .from('ebooks')
     .select('*')
