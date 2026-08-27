@@ -2,15 +2,29 @@ import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
 import Footer from '@/components/Footer'
 import Reveal from '@/components/Reveal'
+import PartnerBadge from '@/components/ui/PartnerBadge'
+import { IconZap, IconDevices, IconLock } from '@/components/icons'
 
 export const metadata = {
   title: 'KodaBooks | Evolua seu conhecimento',
   description: 'Acesse e-books exclusivos e práticos na KodaBooks. Feito com ScorpionBits.',
 }
 
+const FEATURES = [
+  { icon: IconZap, title: 'Acesso Imediato', text: 'Receba seu material na mesma hora e comece a aprender sem enrolação.' },
+  { icon: IconDevices, title: 'Leia em Qualquer Lugar', text: 'Baixe seus e-books e estude no celular, tablet ou computador, a qualquer momento.' },
+  { icon: IconLock, title: 'Pagamento Seguro', text: 'Pagamentos rápidos e totalmente seguros processados via AbacatePay (PIX).' },
+]
+
+const FAQ = [
+  { q: 'Como recebo o acesso?', a: 'Após a confirmação do pagamento, o e-book será adicionado automaticamente à sua biblioteca virtual e você receberá um e-mail de aviso.' },
+  { q: 'É seguro comprar?', a: 'Sim, utilizamos a AbacatePay para intermediar todos os pagamentos (PIX), garantindo 100% de segurança na sua transação e seus dados.' },
+  { q: 'Posso ler offline?', a: 'Sim! Uma vez liberado na sua biblioteca, você pode baixar o PDF para o seu dispositivo e ler quando e onde quiser, sem internet.' },
+]
+
 export default async function LandingPage() {
   const supabase = createServiceClient()
-  
+
   // Buscar até 4 e-books ativos para a vitrine
   const { data: ebooks } = await supabase
     .from('ebooks')
@@ -19,30 +33,17 @@ export default async function LandingPage() {
     .limit(4)
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Header/Nav */}
-      <header style={{
-        padding: 'var(--space-md) var(--space-xl)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: '1px solid var(--border-subtle)',
-        background: 'var(--bg-secondary)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 800 }}>
+    <div className="page-shell">
+      <header className="landing-header">
+        <div className="landing-header-brand">
+          <h1 className="landing-logo">
             <span className="text-gradient">Koda</span>Books
           </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', opacity: 0.8, borderLeft: '1px solid var(--border-default)', paddingLeft: 'var(--space-md)' }}>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>by</span>
-            <img src="/scorpionbits-logo.png" alt="ScorpionBits" style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} />
-            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff' }}>ScorpionBits</span>
+          <div className="landing-header-partner">
+            <PartnerBadge label="by" />
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
+        <div className="flex gap-md">
           <Link href="/login" className="btn btn-secondary">
             Entrar
           </Link>
@@ -52,110 +53,52 @@ export default async function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main style={{ flex: 1 }}>
+      <main>
         <Reveal y={20}>
-          <section style={{
-            padding: 'var(--space-3xl) var(--space-xl)',
-            textAlign: 'center',
-            background: 'linear-gradient(to bottom, var(--bg-secondary), var(--bg-primary))',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 'var(--space-lg)'
-          }}>
-            <div style={{
-              display: 'inline-block',
-              padding: '4px 12px',
-              background: 'var(--accent-gradient-soft)',
-              color: 'var(--accent-secondary)',
-              borderRadius: 'var(--radius-full)',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              marginBottom: 'var(--space-sm)'
-            }}>
-              Novo e Melhorado ✨
-            </div>
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              fontWeight: 800,
-              maxWidth: '800px',
-              lineHeight: 1.1,
-              letterSpacing: '-0.02em'
-            }}>
+          <section className="landing-hero">
+            <h2 className="landing-hero-title">
               Evolua seu conhecimento com a <span className="text-gradient">KodaBooks</span>
             </h2>
-            <p style={{
-              fontSize: '1.125rem',
-              color: 'var(--text-secondary)',
-              maxWidth: '600px',
-              lineHeight: 1.6,
-              marginBottom: 'var(--space-md)'
-            }}>
-              Descubra materiais práticos, diretos ao ponto e aprenda no seu ritmo. 
+            <p className="landing-hero-subtitle">
+              Descubra materiais práticos, diretos ao ponto e aprenda no seu ritmo.
               Sua biblioteca digital premium a um clique de distância.
             </p>
-            <div style={{ display: 'flex', gap: 'var(--space-md)', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Link href="/cadastro" className="btn btn-primary btn-lg" style={{ fontSize: '1.125rem', padding: '12px 32px' }}>
+            <div className="flex gap-md justify-center" style={{ flexWrap: 'wrap' }}>
+              <Link href="/cadastro" className="btn btn-primary btn-lg">
                 Explorar Catálogo Livre
               </Link>
             </div>
           </section>
         </Reveal>
 
-        {/* Features / Benefícios */}
         <Reveal>
-          <section style={{
-            padding: 'var(--space-3xl) var(--space-xl)',
-            maxWidth: '1200px',
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 'var(--space-xl)'
-          }}>
-            <div className="glass-card" style={{ padding: 'var(--space-xl)', textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', marginBottom: 'var(--space-md)' }}>🚀</div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-sm)' }}>Acesso Imediato</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>Receba seu material na mesma hora e comece a aprender sem enrolação.</p>
-            </div>
-            <div className="glass-card" style={{ padding: 'var(--space-xl)', textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', marginBottom: 'var(--space-md)' }}>📱</div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-sm)' }}>Leia em Qualquer Lugar</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>Baixe seus e-books e estude no celular, tablet ou computador, a qualquer momento.</p>
-            </div>
-            <div className="glass-card" style={{ padding: 'var(--space-xl)', textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', marginBottom: 'var(--space-md)' }}>🔒</div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-sm)' }}>Pagamento Seguro</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>Pagamentos rápidos e totalmente seguros processados via AbacatePay (PIX).</p>
-            </div>
+          <section className="landing-features">
+            {FEATURES.map((f) => (
+              <div key={f.title} className="glass-card landing-feature-card">
+                <div className="landing-feature-icon"><f.icon size={28} /></div>
+                <h3>{f.title}</h3>
+                <p className="text-secondary">{f.text}</p>
+              </div>
+            ))}
           </section>
         </Reveal>
 
-        {/* Vitrine (E-books reais) */}
         {ebooks && ebooks.length > 0 && (
           <Reveal>
-            <section style={{
-              padding: 'var(--space-3xl) var(--space-xl)',
-              background: 'var(--bg-secondary)',
-              borderTop: '1px solid var(--border-subtle)',
-              borderBottom: '1px solid var(--border-subtle)',
-            }}>
-              <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-                <div style={{ textAlign: 'center', marginBottom: 'var(--space-2xl)' }}>
-                  <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-xs)' }}>
-                    Destaques do Catálogo
-                  </h2>
-                  <p style={{ color: 'var(--text-secondary)' }}>Os conteúdos mais procurados do momento.</p>
+            <section className="landing-showcase">
+              <div className="landing-showcase-inner">
+                <div className="text-center mb-xl">
+                  <h2>Destaques do Catálogo</h2>
+                  <p className="text-secondary">Os conteúdos mais procurados do momento.</p>
                 </div>
 
                 <div className="ebook-grid">
                   {ebooks.map((ebook, index) => (
-                    <Link 
+                    <Link
                       key={ebook.id}
                       href="/cadastro"
                       className="glass-card ebook-card animate-in"
-                      style={{ animationDelay: `${index * 80}ms`, textDecoration: 'none', display: 'block', cursor: 'pointer' }}
+                      style={{ animationDelay: `${index * 80}ms` }}
                     >
                       {ebook.cover_url ? (
                         <img
@@ -164,20 +107,14 @@ export default async function LandingPage() {
                           className="ebook-card-cover"
                         />
                       ) : (
-                        <div className="ebook-card-cover" style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '3rem',
-                          background: 'var(--bg-tertiary)',
-                        }}>
-                          📖
+                        <div className="ebook-card-cover ebook-card-cover-placeholder">
+                          <IconDevices size={40} />
                         </div>
                       )}
                       <div className="ebook-card-body">
                         <h3 className="ebook-card-title">{ebook.title}</h3>
-                        <div className="ebook-card-footer" style={{ marginTop: 'var(--space-md)' }}>
-                          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        <div className="ebook-card-footer mt-md">
+                          <span className="ebook-card-price">
                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(ebook.price || 0)}
                           </span>
                           <span className="text-secondary" style={{ fontSize: '0.8rem' }}>
@@ -188,56 +125,35 @@ export default async function LandingPage() {
                     </Link>
                   ))}
                 </div>
-                
-                <div style={{ textAlign: 'center', marginTop: 'var(--space-2xl)' }}>
-                   <Link href="/cadastro" className="btn btn-secondary btn-lg">
-                      Ver Catálogo Completo
-                   </Link>
+
+                <div className="text-center mt-xl">
+                  <Link href="/cadastro" className="btn btn-secondary btn-lg">
+                    Ver Catálogo Completo
+                  </Link>
                 </div>
               </div>
             </section>
           </Reveal>
         )}
 
-        {/* FAQ Section */}
         <Reveal>
-          <section style={{
-            padding: 'var(--space-3xl) var(--space-xl)',
-            maxWidth: '800px',
-            margin: '0 auto'
-          }}>
-            <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-2xl)', textAlign: 'center' }}>
-              Perguntas Frequentes
-            </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-              <div className="glass-card" style={{ padding: 'var(--space-lg)' }}>
-                <h3 style={{ fontSize: '1.125rem', marginBottom: 'var(--space-xs)' }}>Como recebo o acesso?</h3>
-                <p style={{ color: 'var(--text-secondary)' }}>Após a confirmação do pagamento, o e-book será adicionado automaticamente à sua biblioteca virtual e você receberá um e-mail de aviso.</p>
-              </div>
-              <div className="glass-card" style={{ padding: 'var(--space-lg)' }}>
-                <h3 style={{ fontSize: '1.125rem', marginBottom: 'var(--space-xs)' }}>É seguro comprar?</h3>
-                <p style={{ color: 'var(--text-secondary)' }}>Sim, utilizamos a AbacatePay para intermediar todos os pagamentos (PIX), garantindo 100% de segurança na sua transação e seus dados.</p>
-              </div>
-              <div className="glass-card" style={{ padding: 'var(--space-lg)' }}>
-                <h3 style={{ fontSize: '1.125rem', marginBottom: 'var(--space-xs)' }}>Posso ler offline?</h3>
-                <p style={{ color: 'var(--text-secondary)' }}>Sim! Uma vez liberado na sua biblioteca, você pode baixar o PDF para o seu dispositivo e ler quando e onde quiser, sem internet.</p>
-              </div>
+          <section className="landing-faq">
+            <h2 className="text-center mb-xl">Perguntas Frequentes</h2>
+            <div className="flex flex-col gap-md">
+              {FAQ.map((item) => (
+                <div key={item.q} className="glass-card landing-faq-item">
+                  <h3>{item.q}</h3>
+                  <p className="text-secondary">{item.a}</p>
+                </div>
+              ))}
             </div>
           </section>
         </Reveal>
 
-        {/* Bottom CTA */}
         <Reveal>
-          <section style={{
-            padding: 'var(--space-3xl) var(--space-xl)',
-            textAlign: 'center',
-            maxWidth: '800px',
-            margin: '0 auto'
-          }}>
-            <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-md)' }}>
-              Pronto para dar o próximo passo?
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-xl)', fontSize: '1.125rem' }}>
+          <section className="landing-cta">
+            <h2 className="mb-md">Pronto para dar o próximo passo?</h2>
+            <p className="text-secondary mb-xl" style={{ fontSize: '1.125rem' }}>
               Crie sua conta gratuitamente em menos de 1 minuto e tenha acesso à sua biblioteca particular.
             </p>
             <Link href="/cadastro" className="btn btn-primary btn-lg">

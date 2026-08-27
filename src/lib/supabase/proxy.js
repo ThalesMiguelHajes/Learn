@@ -29,9 +29,13 @@ export async function updateSession(request) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // getClaims() verifies the JWT locally (via the project's cached JWKS) when the
+  // Supabase project uses asymmetric signing keys, avoiding a network round-trip to
+  // the Auth server on every request — unlike getUser(), which always calls out.
+  // It transparently falls back to a network call if the project still uses a
+  // symmetric secret, so this is a safe, zero-downside swap either way.
+  const { data } = await supabase.auth.getClaims()
+  const user = data?.claims ? { id: data.claims.sub, email: data.claims.email } : null
 
   return { user, supabase, supabaseResponse }
 }

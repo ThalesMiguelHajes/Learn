@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import EbookActions from '@/components/biblioteca/EbookActions'
+import { IconArrowLeft, IconBookOpen } from '@/components/icons'
 
 export async function generateMetadata({ params }) {
   const { id } = await params
@@ -40,11 +41,11 @@ export default async function DetalhesLivroPage({ params }) {
 
   if (!ownership) {
     return (
-      <div className="pdf-error" style={{ height: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="glass-card" style={{ padding: '2rem', textAlign: 'center' }}>
+      <div className="center-message-page">
+        <div className="glass-card center-message-card">
           <h2>Acesso Negado</h2>
           <p>Você não possui acesso a este e-book.</p>
-          <Link href="/biblioteca" className="btn btn-primary" style={{ marginTop: 'var(--space-md)' }}>
+          <Link href="/biblioteca" className="btn btn-primary mt-md">
             Voltar para a Biblioteca
           </Link>
         </div>
@@ -61,10 +62,10 @@ export default async function DetalhesLivroPage({ params }) {
 
   if (!ebook) {
     return (
-      <div className="pdf-error" style={{ height: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="glass-card" style={{ padding: '2rem', textAlign: 'center' }}>
+      <div className="center-message-page">
+        <div className="glass-card center-message-card">
           <h2>Livro não encontrado</h2>
-          <Link href="/biblioteca" className="btn btn-primary" style={{ marginTop: 'var(--space-md)' }}>
+          <Link href="/biblioteca" className="btn btn-primary mt-md">
             Voltar para a Biblioteca
           </Link>
         </div>
@@ -74,8 +75,8 @@ export default async function DetalhesLivroPage({ params }) {
 
   return (
     <div className="livro-details-page">
-      <Link href="/biblioteca" className="btn-icon" style={{ marginBottom: 'var(--space-md)', width: 'auto', padding: '0 var(--space-sm)' }}>
-        &larr; Voltar
+      <Link href="/biblioteca" className="back-link">
+        <IconArrowLeft size={16} /> Voltar
       </Link>
 
       <div className="glass-card livro-details-layout">
@@ -83,10 +84,10 @@ export default async function DetalhesLivroPage({ params }) {
           {ebook.cover_url ? (
             <img src={ebook.cover_url} alt={`Capa de ${ebook.title}`} />
           ) : (
-            <div className="cover-placeholder">📖</div>
+            <div className="cover-placeholder"><IconBookOpen size={48} /></div>
           )}
         </div>
-        
+
         <div className="livro-info">
           {ebook.file_type && (
             <span className="badge badge-info">{ebook.file_type.toUpperCase()}</span>

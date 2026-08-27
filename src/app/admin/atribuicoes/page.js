@@ -1,43 +1,28 @@
-'use client'
+import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth'
+import Pagination from '@/components/ui/Pagination'
+import { IconBookOpen, IconLink } from '@/components/icons'
 
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+const PAGE_SIZE = 25
 
-export default function AtribuicoesPage() {
-  const [atribuicoes, setAtribuicoes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const supabase = createClient()
+export default async function AtribuicoesPage({ searchParams }) {
+  await requireAdmin()
+  const { page: pageParam } = await searchParams || {}
+  const page = Math.max(1, parseInt(pageParam, 10) || 1)
+  const from = (page - 1) * PAGE_SIZE
+  const to = from + PAGE_SIZE - 1
 
-  useEffect(() => {
-    fetchAtribuicoes()
-  }, [])
-
-  async function fetchAtribuicoes() {
-    setLoading(true)
-
-    const { data, error } = await supabase
-      .from('user_ebooks')
-      .select(`
-        *,
-        profiles!user_ebooks_user_id_fkey(full_name, email),
-        ebooks(title, cover_url, price),
-        assigned_profile:profiles!user_ebooks_assigned_by_fkey(full_name)
-      `)
-      .order('assigned_at', { ascending: false })
-
-    if (!error) setAtribuicoes(data || [])
-    setLoading(false)
-  }
-
-  const filtered = atribuicoes.filter(a => {
-    const term = search.toLowerCase()
-    return (
-      a.profiles?.full_name?.toLowerCase().includes(term) ||
-      a.profiles?.email?.toLowerCase().includes(term) ||
-      a.ebooks?.title?.toLowerCase().includes(term)
-    )
-  })
+  const supabase = await createClient()
+  const { data: atribuicoes, count } = await supabase
+    .from('user_ebooks')
+    .select(`
+      *,
+      profiles!user_ebooks_user_id_fkey(full_name, email),
+      ebooks(title, cover_url, price),
+      assigned_profile:profiles!user_ebooks_assigned_by_fkey(full_name)
+    `, { count: 'exact' })
+    .order('assigned_at', { ascending: false })
+    .range(from, to)
 
   return (
     <>
@@ -48,71 +33,56 @@ export default function AtribuicoesPage() {
         </div>
       </div>
 
-      <div className="search-bar mb-lg">
-        <span className="search-icon">🔍</span>
-        <input
-          type="text"
-          className="form-input"
-          placeholder="Buscar por cliente ou e-book..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ paddingLeft: '2.75rem' }}
-          id="search-atribuicoes"
-        />
-      </div>
-
-      {loading ? (
-        <div className="loading-page">
-          <div className="spinner spinner-lg" />
-          <p>Carregando atribuições...</p>
-        </div>
-      ) : filtered.length === 0 ? (
+      {!atribuicoes || atribuicoes.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-icon">🔗</div>
-          <h3>{search ? 'Nenhum resultado encontrado' : 'Nenhuma atribuição realizada'}</h3>
-          <p>{search ? 'Tente outro termo.' : 'Atribua e-books aos clientes na página de Usuários.'}</p>
+          <div className="empty-icon"><IconLink size={40} /></div>
+          <h3>Nenhuma atribuição realizada</h3>
+          <p>Atribua e-books aos clientes na página de Usuários.</p>
         </div>
       ) : (
-        <div className="table-container">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>E-book</th>
-                <th>Atribuído por</th>
-                <th>Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((a) => (
-                <tr key={a.id}>
-                  <td>
-                    <div>
-                      <div style={{ fontWeight: 600 }}>{a.profiles?.full_name || '—'}</div>
-                      <div style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)' }}>{a.profiles?.email}</div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-md">
-                      {a.ebooks?.cover_url ? (
-                        <img src={a.ebooks.cover_url} alt="" style={{ width: '32px', height: '42px', objectFit: 'cover', borderRadius: '4px' }} />
-                      ) : (
-                        <div style={{ width: '32px', height: '42px', background: 'var(--bg-tertiary)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem' }}>📖</div>
-                      )}
-                      <span style={{ fontWeight: 500 }}>{a.ebooks?.title || '—'}</span>
-                    </div>
-                  </td>
-                  <td style={{ color: 'var(--text-secondary)' }}>
-                    {a.assigned_profile?.full_name || 'Sistema'}
-                  </td>
-                  <td style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                    {new Date(a.assigned_at).toLocaleDateString('pt-BR')}
-                  </td>
+        <>
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>E-book</th>
+                  <th>Atribuído por</th>
+                  <th>Data</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {atribuicoes.map((a) => (
+                  <tr key={a.id}>
+                    <td>
+                      <div className="font-semibold">{a.profiles?.full_name || '—'}</div>
+                      <div className="text-tertiary" style={{ fontSize: '0.8125rem' }}>{a.profiles?.email}</div>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-md">
+                        {a.ebooks?.cover_url ? (
+                          <img src={a.ebooks.cover_url} alt="" className="table-thumbnail-sm" />
+                        ) : (
+                          <div className="table-thumbnail-sm flex items-center justify-center">
+                            <IconBookOpen size={16} />
+                          </div>
+                        )}
+                        <span style={{ fontWeight: 500 }}>{a.ebooks?.title || '—'}</span>
+                      </div>
+                    </td>
+                    <td className="text-secondary">
+                      {a.assigned_profile?.full_name || 'Sistema'}
+                    </td>
+                    <td className="text-secondary" style={{ whiteSpace: 'nowrap' }}>
+                      {new Date(a.assigned_at).toLocaleDateString('pt-BR')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination page={page} pageSize={PAGE_SIZE} total={count || 0} />
+        </>
       )}
     </>
   )

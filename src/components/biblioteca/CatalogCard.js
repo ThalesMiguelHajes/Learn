@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { IconCheckCircle, IconBookOpen, IconCart, IconDevices } from '@/components/icons'
 
 export default function CatalogCard({ ebook, index, hasEbook = false }) {
   const [loading, setLoading] = useState(false)
@@ -26,24 +27,12 @@ export default function CatalogCard({ ebook, index, hasEbook = false }) {
 
   return (
     <div
-      className="glass-card ebook-card animate-in"
-      style={{ animationDelay: `${index * 80}ms`, position: 'relative' }}
+      className="glass-card ebook-card animate-in catalog-card"
+      style={{ animationDelay: `${index * 80}ms` }}
     >
       {hasEbook && (
-        <div style={{
-          position: 'absolute',
-          top: 'var(--space-sm)',
-          right: 'var(--space-sm)',
-          background: 'var(--success)',
-          color: '#fff',
-          padding: '4px 8px',
-          borderRadius: 'var(--radius-sm)',
-          fontSize: '0.75rem',
-          fontWeight: 'bold',
-          zIndex: 2,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-        }}>
-          ✅ Na Biblioteca
+        <div className="catalog-card-owned-badge">
+          <IconCheckCircle size={14} /> Na Biblioteca
         </div>
       )}
       {ebook.cover_url ? (
@@ -53,14 +42,8 @@ export default function CatalogCard({ ebook, index, hasEbook = false }) {
           className="ebook-card-cover"
         />
       ) : (
-        <div className="ebook-card-cover" style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '3rem',
-          background: 'var(--bg-tertiary)',
-        }}>
-          📖
+        <div className="ebook-card-cover ebook-card-cover-placeholder">
+          <IconDevices size={40} />
         </div>
       )}
       <div className="ebook-card-body">
@@ -70,14 +53,7 @@ export default function CatalogCard({ ebook, index, hasEbook = false }) {
         )}
 
         {error && (
-          <p style={{
-            fontSize: '0.78rem',
-            color: 'var(--error, #f87171)',
-            marginBottom: 'var(--space-xs)',
-            lineHeight: 1.4,
-          }}>
-            {error}
-          </p>
+          <p className="form-error mb-xs">{error}</p>
         )}
 
         <div className="ebook-card-footer">
@@ -87,9 +63,14 @@ export default function CatalogCard({ ebook, index, hasEbook = false }) {
             onClick={handleBuy}
             disabled={loading}
             className={`btn ${hasEbook ? 'btn-secondary' : 'btn-primary'} btn-sm`}
-            style={{ opacity: loading ? 0.7 : 1, cursor: loading ? 'wait' : 'pointer' }}
           >
-            {loading ? '⏳ Aguarde...' : (hasEbook ? '📖 Ler' : '🛒 Comprar')}
+            {loading ? (
+              <><span className="spinner" /> Aguarde...</>
+            ) : hasEbook ? (
+              <><IconBookOpen size={14} /> Ler</>
+            ) : (
+              <><IconCart size={14} /> Comprar</>
+            )}
           </button>
         </div>
       </div>

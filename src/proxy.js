@@ -21,10 +21,10 @@ export async function proxy(request) {
       if (role) {
         supabaseResponse.cookies.set('user_role', role, {
           path: '/',
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+          maxAge: 60 * 5, // 5 minutes — short-lived so a role change takes effect quickly
+          httpOnly: true,
         })
       }
-      console.log('[PROXY] Fetched role from DB:', role)
     }
   } else {
     // If no user but cookie exists, clear it
@@ -36,7 +36,6 @@ export async function proxy(request) {
 
   // Protect /admin routes — require admin role
   if (pathname.startsWith('/admin')) {
-    console.log('[PROXY] Accessing /admin - user:', user?.id, 'role:', role)
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'

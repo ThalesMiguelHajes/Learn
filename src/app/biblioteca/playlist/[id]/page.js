@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import EbookCard from '@/components/biblioteca/EbookCard'
+import { IconArrowLeft, IconFolder } from '@/components/icons'
 
 export async function generateMetadata({ params }) {
   const { id } = await params
@@ -40,11 +41,11 @@ export default async function PlaylistPage({ params }) {
 
   if (!playlist) {
     return (
-      <div className="pdf-error" style={{ height: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="glass-card" style={{ padding: '2rem', textAlign: 'center' }}>
+      <div className="center-message-page">
+        <div className="glass-card center-message-card">
           <h2>Playlist não encontrada</h2>
           <p>Esta playlist não existe ou você não tem permissão para vê-la.</p>
-          <Link href="/biblioteca?tab=playlists" className="btn btn-primary" style={{ marginTop: 'var(--space-md)' }}>
+          <Link href="/biblioteca?tab=playlists" className="btn btn-primary mt-md">
             Voltar para Playlists
           </Link>
         </div>
@@ -65,13 +66,13 @@ export default async function PlaylistPage({ params }) {
 
   return (
     <div className="playlist-page">
-      <Link href="/biblioteca?tab=playlists" className="btn-icon" style={{ marginBottom: 'var(--space-md)', width: 'auto', padding: '0 var(--space-sm)' }}>
-        &larr; Voltar
+      <Link href="/biblioteca?tab=playlists" className="back-link">
+        <IconArrowLeft size={16} /> Voltar
       </Link>
 
-      <div className="page-header" style={{ marginBottom: 'var(--space-xl)' }}>
+      <div className="page-header mb-xl">
         <div className="page-header-left">
-          <h1>🗂️ {playlist.title}</h1>
+          <h1 className="flex items-center gap-sm"><IconFolder size={24} /> {playlist.title}</h1>
           <p className="text-secondary">{ebooks.length} e-book{ebooks.length !== 1 ? 's' : ''} nesta coleção.</p>
         </div>
       </div>
@@ -79,7 +80,7 @@ export default async function PlaylistPage({ params }) {
       {!ebooks || ebooks.length === 0 ? (
         <div className="glass-card">
           <div className="empty-state">
-            <div className="empty-icon">📂</div>
+            <div className="empty-icon"><IconFolder size={40} /></div>
             <h3>Playlist Vazia</h3>
             <p>Você ainda não adicionou nenhum e-book a esta playlist.</p>
           </div>

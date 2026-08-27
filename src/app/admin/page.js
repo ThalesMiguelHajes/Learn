@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { IconWallet, IconBooks, IconUsers, IconBookOpen } from '@/components/icons'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -32,40 +33,40 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="stats-grid">
-        <div className="glass-card stat-card" style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-          <div className="stat-icon">💰</div>
-          <div className="stat-value" style={{ color: 'var(--accent-primary)' }}>
+        <div className="glass-card stat-card stat-card-highlight">
+          <div className="stat-icon"><IconWallet size={22} /></div>
+          <div className="stat-value stat-value-accent">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(totalRevenue)}
           </div>
-          <div className="stat-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="stat-label flex justify-between items-center">
             <span>Faturamento</span>
             <span className="badge badge-accent">{totalVendas} venda{totalVendas !== 1 ? 's' : ''}</span>
           </div>
         </div>
 
         <div className="glass-card stat-card">
-          <div className="stat-icon">📚</div>
+          <div className="stat-icon"><IconBooks size={22} /></div>
           <div className="stat-value">{totalEbooks}</div>
           <div className="stat-label">E-books cadastrados</div>
         </div>
 
         <div className="glass-card stat-card">
-          <div className="stat-icon">👥</div>
+          <div className="stat-icon"><IconUsers size={22} /></div>
           <div className="stat-value">{totalClientes}</div>
           <div className="stat-label">Clientes registrados</div>
         </div>
       </div>
 
-      <div className="glass-card" style={{ padding: 'var(--space-xl)' }}>
-        <h3 style={{ marginBottom: 'var(--space-lg)' }}>E-books Recentes</h3>
+      <div className="glass-card panel">
+        <h3 className="mb-lg">E-books Recentes</h3>
         {recentEbooks.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">📚</div>
+            <div className="empty-icon"><IconBooks size={40} /></div>
             <h3>Nenhum e-book cadastrado</h3>
             <p>Comece adicionando seu primeiro e-book.</p>
           </div>
         ) : (
-          <div className="table-container" style={{ border: 'none', background: 'transparent' }}>
+          <div className="table-container table-container-flat">
             <table className="table">
               <thead>
                 <tr>
@@ -82,7 +83,9 @@ export default async function AdminDashboard() {
                       {ebook.cover_url ? (
                         <img src={ebook.cover_url} alt="" className="table-thumbnail" />
                       ) : (
-                        <div className="table-thumbnail" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>📖</div>
+                        <div className="table-thumbnail flex items-center justify-center">
+                          <IconBookOpen size={20} />
+                        </div>
                       )}
                     </td>
                     <td style={{ fontWeight: 600 }}>{ebook.title}</td>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import AddToPlaylistModal from './AddToPlaylistModal'
+import { IconBookOpen, IconDownload, IconFolder } from '@/components/icons'
 
 export default function EbookActions({ ebookId, fileType, title, fileName }) {
   const [downloading, setDownloading] = useState(false)
@@ -38,35 +39,35 @@ export default function EbookActions({ ebookId, fileType, title, fileName }) {
 
   return (
     <>
-      <div className="ebook-actions" style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-lg)' }}>
+      <div className="ebook-actions flex gap-sm mt-lg">
         {fileType === 'pdf' && (
-          <Link 
+          <Link
             href={`/biblioteca/ler/${ebookId}`}
-            className="btn btn-primary"
-            style={{ flex: 1, justifyContent: 'center' }}
+            className="btn btn-primary justify-center"
+            style={{ flex: 1 }}
           >
-            📖 Ler Agora
+            <IconBookOpen size={16} /> Ler Agora
           </Link>
         )}
         <button
-          className="btn btn-secondary"
+          className="btn btn-secondary justify-center"
           onClick={handleDownload}
           disabled={downloading}
-          style={{ flex: 1, justifyContent: 'center' }}
+          style={{ flex: 1 }}
         >
           {downloading ? (
             <><span className="spinner" style={{ marginRight: '8px' }} /> Baixando...</>
           ) : (
-            '⬇️ Download'
+            <><IconDownload size={16} /> Download</>
           )}
         </button>
         <button
-          className="btn btn-secondary"
+          className="btn btn-secondary justify-center"
           onClick={() => setShowModal(true)}
-          style={{ flex: 1, justifyContent: 'center' }}
+          style={{ flex: 1 }}
           title="Adicionar à Playlist"
         >
-          🗂️ Playlist
+          <IconFolder size={16} /> Playlist
         </button>
       </div>
 

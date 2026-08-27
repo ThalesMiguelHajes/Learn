@@ -53,18 +53,8 @@ export default async function CheckoutPage({ params }) {
     .single()
 
   return (
-    <div style={{
-      maxWidth: '800px',
-      margin: '0 auto',
-      padding: 'var(--space-2xl) var(--space-xl)',
-    }}>
-      <h1 style={{ 
-        fontSize: '2rem', 
-        marginBottom: 'var(--space-2xl)',
-        fontFamily: 'var(--font-display)',
-        color: 'var(--text-primary)',
-        textAlign: 'center'
-      }}>
+    <div className="checkout-page">
+      <h1 className="checkout-page-title">
         Finalizar Compra
       </h1>
 

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
 export async function createSale({ userId, ebookIds, totalAmount }) {
@@ -8,13 +9,9 @@ export async function createSale({ userId, ebookIds, totalAmount }) {
     return { error: 'Cliente e e-books são obrigatórios.' }
   }
 
-  const supabase = await createClient()
+  const { user } = await requireAdmin()
 
-  // Ensure admin privileges
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'Não autorizado.' }
-  }
+  const supabase = await createClient()
 
   // 1. Criar a venda na tabela sales
   const { data: sale, error: saleError } = await supabase

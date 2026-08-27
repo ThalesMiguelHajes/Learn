@@ -1,54 +1,33 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { Suspense } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth'
+import SearchBar from '@/components/biblioteca/SearchBar'
+import Pagination from '@/components/ui/Pagination'
+import Avatar from '@/components/ui/Avatar'
+import { IconUsers } from '@/components/icons'
 
-export default function UsuariosPage() {
-  const [usuarios, setUsuarios] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const supabase = createClient()
+const PAGE_SIZE = 20
 
-  useEffect(() => {
-    fetchUsuarios()
-  }, [])
+export default async function UsuariosPage({ searchParams }) {
+  await requireAdmin()
+  const { q, page: pageParam } = await searchParams || {}
+  const page = Math.max(1, parseInt(pageParam, 10) || 1)
+  const from = (page - 1) * PAGE_SIZE
+  const to = from + PAGE_SIZE - 1
 
-  async function fetchUsuarios() {
-    setLoading(true)
+  const supabase = await createClient()
+  let query = supabase
+    .from('profiles')
+    .select('*, user_ebooks(count)', { count: 'exact' })
+    .eq('role', 'cliente')
+    .order('created_at', { ascending: false })
 
-    // Fetch clients with their ebook count
-    const { data: profiles, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('role', 'cliente')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      setLoading(false)
-      return
-    }
-
-    // Get ebook counts for each user
-    const usersWithCounts = await Promise.all(
-      (profiles || []).map(async (profile) => {
-        const { count } = await supabase
-          .from('user_ebooks')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', profile.id)
-
-        return { ...profile, ebook_count: count || 0 }
-      })
-    )
-
-    setUsuarios(usersWithCounts)
-    setLoading(false)
+  if (q) {
+    query = query.or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
   }
 
-  const filtered = usuarios.filter(u =>
-    u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    u.email?.toLowerCase().includes(search.toLowerCase())
-  )
+  const { data: usuarios, count } = await query.range(from, to)
 
   return (
     <>
@@ -59,88 +38,60 @@ export default function UsuariosPage() {
         </div>
       </div>
 
-      <div className="search-bar mb-lg">
-        <span className="search-icon">🔍</span>
-        <input
-          type="text"
-          className="form-input"
-          placeholder="Buscar por nome ou e-mail..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ paddingLeft: '2.75rem' }}
-          id="search-users"
-        />
-      </div>
+      <Suspense fallback={<div className="search-bar mb-lg" />}>
+        <SearchBar placeholder="Buscar por nome ou e-mail..." />
+      </Suspense>
 
-      {loading ? (
-        <div className="loading-page">
-          <div className="spinner spinner-lg" />
-          <p>Carregando usuários...</p>
-        </div>
-      ) : filtered.length === 0 ? (
+      {!usuarios || usuarios.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-icon">👥</div>
-          <h3>{search ? 'Nenhum resultado encontrado' : 'Nenhum cliente registrado'}</h3>
-          <p>{search ? 'Tente outro termo de busca.' : 'Os clientes aparecerão aqui após se cadastrarem.'}</p>
+          <div className="empty-icon"><IconUsers size={40} /></div>
+          <h3>{q ? 'Nenhum resultado encontrado' : 'Nenhum cliente registrado'}</h3>
+          <p>{q ? 'Tente outro termo de busca.' : 'Os clientes aparecerão aqui após se cadastrarem.'}</p>
         </div>
       ) : (
-        <div className="table-container">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Usuário</th>
-                <th>E-mail</th>
-                <th>E-books</th>
-                <th>Cadastro</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((user) => {
-                const initials = user.full_name
-                  ? user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-                  : '?'
-
-                return (
-                  <tr key={user.id}>
-                    <td>
-                      <div className="flex items-center gap-md">
-                        <div style={{
-                          width: '36px',
-                          height: '36px',
-                          borderRadius: 'var(--radius-full)',
-                          background: 'var(--accent-gradient)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontWeight: 700,
-                          fontSize: '0.75rem',
-                          color: '#fff',
-                          flexShrink: 0,
-                        }}>
-                          {initials}
+        <>
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>E-mail</th>
+                  <th>E-books</th>
+                  <th>Cadastro</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {usuarios.map((user) => {
+                  const ebookCount = user.user_ebooks?.[0]?.count || 0
+                  return (
+                    <tr key={user.id}>
+                      <td>
+                        <div className="flex items-center gap-md">
+                          <Avatar name={user.full_name} size={36} />
+                          <span className="font-semibold">{user.full_name || 'Sem nome'}</span>
                         </div>
-                        <span style={{ fontWeight: 600 }}>{user.full_name || 'Sem nome'}</span>
-                      </div>
-                    </td>
-                    <td style={{ color: 'var(--text-secondary)' }}>{user.email}</td>
-                    <td>
-                      <span className="badge badge-accent">{user.ebook_count} e-book{user.ebook_count !== 1 ? 's' : ''}</span>
-                    </td>
-                    <td style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                      {new Date(user.created_at).toLocaleDateString('pt-BR')}
-                    </td>
-                    <td>
-                      <Link href={`/admin/usuarios/${user.id}`} className="btn btn-secondary btn-sm">
-                        📚 Gerenciar E-books
-                      </Link>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+                      <td className="text-secondary">{user.email}</td>
+                      <td>
+                        <span className="badge badge-accent">{ebookCount} e-book{ebookCount !== 1 ? 's' : ''}</span>
+                      </td>
+                      <td className="text-secondary" style={{ whiteSpace: 'nowrap' }}>
+                        {new Date(user.created_at).toLocaleDateString('pt-BR')}
+                      </td>
+                      <td>
+                        <Link href={`/admin/usuarios/${user.id}`} className="btn btn-secondary btn-sm">
+                          Gerenciar E-books
+                        </Link>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+          <Pagination page={page} pageSize={PAGE_SIZE} total={count || 0} extraParams={q ? { q } : {}} />
+        </>
       )}
     </>
   )

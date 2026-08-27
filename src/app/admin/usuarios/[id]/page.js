@@ -3,6 +3,9 @@
 import { useState, useEffect, use } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Avatar from '@/components/ui/Avatar'
+import Modal from '@/components/ui/Modal'
+import { IconArrowLeft, IconPlus, IconTrash, IconBookOpen, IconBooks } from '@/components/icons'
 
 export default function GerenciarEbooksUsuario({ params }) {
   const { id: userId } = use(params)
@@ -17,14 +20,9 @@ export default function GerenciarEbooksUsuario({ params }) {
   const supabase = createClient()
   const router = useRouter()
 
-  useEffect(() => {
-    fetchData()
-  }, [userId])
-
   async function fetchData() {
     setLoading(true)
 
-    // Fetch user profile
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
@@ -33,7 +31,6 @@ export default function GerenciarEbooksUsuario({ params }) {
 
     setUser(profile)
 
-    // Fetch assigned ebooks
     const { data: assignments } = await supabase
       .from('user_ebooks')
       .select('*, ebooks(*)')
@@ -42,7 +39,6 @@ export default function GerenciarEbooksUsuario({ params }) {
 
     setAssignedEbooks(assignments || [])
 
-    // Fetch all ebooks for assignment modal
     const { data: ebooks } = await supabase
       .from('ebooks')
       .select('id, title, cover_url, price')
@@ -52,6 +48,10 @@ export default function GerenciarEbooksUsuario({ params }) {
     setAllEbooks(ebooks || [])
     setLoading(false)
   }
+
+  useEffect(() => {
+    fetchData()
+  }, [userId])
 
   const assignedIds = assignedEbooks.map(a => a.ebook_id)
   const availableEbooks = allEbooks.filter(e => !assignedIds.includes(e.id))
@@ -117,10 +117,6 @@ export default function GerenciarEbooksUsuario({ params }) {
     )
   }
 
-  const initials = user?.full_name
-    ? user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-    : '?'
-
   return (
     <>
       <div className="page-header">
@@ -129,31 +125,16 @@ export default function GerenciarEbooksUsuario({ params }) {
           <p>Atribuir ou remover e-books do cliente</p>
         </div>
         <button className="btn btn-secondary" onClick={() => router.push('/admin/usuarios')}>
-          ← Voltar
+          <IconArrowLeft size={16} /> Voltar
         </button>
       </div>
 
-      {/* User info card */}
-      <div className="glass-card" style={{ padding: 'var(--space-xl)', marginBottom: 'var(--space-xl)' }}>
+      <div className="glass-card panel mb-xl">
         <div className="flex items-center gap-lg">
-          <div style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: 'var(--radius-full)',
-            background: 'var(--accent-gradient)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 700,
-            fontSize: '1.125rem',
-            color: '#fff',
-            flexShrink: 0,
-          }}>
-            {initials}
-          </div>
+          <Avatar name={user?.full_name} size={56} />
           <div>
             <h3 style={{ marginBottom: '2px' }}>{user?.full_name || 'Sem nome'}</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>{user?.email}</p>
+            <p className="text-secondary" style={{ fontSize: '0.9375rem' }}>{user?.email}</p>
           </div>
           <div style={{ marginLeft: 'auto' }}>
             <span className="badge badge-accent" style={{ fontSize: '0.875rem', padding: '0.375rem 0.875rem' }}>
@@ -163,7 +144,6 @@ export default function GerenciarEbooksUsuario({ params }) {
         </div>
       </div>
 
-      {/* Assigned ebooks */}
       <div className="flex items-center justify-between mb-lg">
         <h3>E-books Atribuídos</h3>
         <button
@@ -171,16 +151,16 @@ export default function GerenciarEbooksUsuario({ params }) {
           onClick={() => setShowAssignModal(true)}
           disabled={availableEbooks.length === 0}
         >
-          ＋ Atribuir E-book
+          <IconPlus size={16} /> Atribuir E-book
         </button>
       </div>
 
       {assignedEbooks.length === 0 ? (
         <div className="glass-card">
           <div className="empty-state">
-            <div className="empty-icon">📚</div>
+            <div className="empty-icon"><IconBooks size={40} /></div>
             <h3>Nenhum e-book atribuído</h3>
-            <p>Clique em "Atribuir E-book" para dar acesso a um e-book para este cliente.</p>
+            <p>Clique em &ldquo;Atribuir E-book&rdquo; para dar acesso a um e-book para este cliente.</p>
           </div>
         </div>
       ) : (
@@ -202,14 +182,16 @@ export default function GerenciarEbooksUsuario({ params }) {
                     {assignment.ebooks?.cover_url ? (
                       <img src={assignment.ebooks.cover_url} alt="" className="table-thumbnail" />
                     ) : (
-                      <div className="table-thumbnail" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>📖</div>
+                      <div className="table-thumbnail flex items-center justify-center">
+                        <IconBookOpen size={18} />
+                      </div>
                     )}
                   </td>
-                  <td style={{ fontWeight: 600 }}>{assignment.ebooks?.title || '—'}</td>
+                  <td className="font-semibold">{assignment.ebooks?.title || '—'}</td>
                   <td>
                     <span className="badge badge-accent">R$ {Number(assignment.ebooks?.price || 0).toFixed(2)}</span>
                   </td>
-                  <td style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                  <td className="text-secondary" style={{ whiteSpace: 'nowrap' }}>
                     {new Date(assignment.assigned_at).toLocaleDateString('pt-BR')}
                   </td>
                   <td>
@@ -218,7 +200,7 @@ export default function GerenciarEbooksUsuario({ params }) {
                       onClick={() => handleRemove(assignment.ebook_id)}
                       disabled={removing === assignment.ebook_id}
                     >
-                      {removing === assignment.ebook_id ? <span className="spinner" /> : '🗑️ Remover'}
+                      {removing === assignment.ebook_id ? <span className="spinner" /> : <><IconTrash size={14} /> Remover</>}
                     </button>
                   </td>
                 </tr>
@@ -228,48 +210,12 @@ export default function GerenciarEbooksUsuario({ params }) {
         </div>
       )}
 
-      {/* Assign modal */}
       {showAssignModal && (
-        <div className="modal-overlay" onClick={() => !assigning && setShowAssignModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Atribuir E-books</h3>
-              <button className="btn btn-ghost btn-sm" onClick={() => setShowAssignModal(false)} disabled={assigning}>✕</button>
-            </div>
-            <div className="modal-body">
-              {availableEbooks.length === 0 ? (
-                <p style={{ color: 'var(--text-secondary)' }}>Todos os e-books já foram atribuídos a este cliente.</p>
-              ) : (
-                <>
-                  <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)', fontSize: '0.875rem' }}>
-                    Selecione os e-books que deseja atribuir a <strong style={{ color: 'var(--text-primary)' }}>{user?.full_name}</strong>:
-                  </p>
-                  <div className="checkbox-list">
-                    {availableEbooks.map((ebook) => (
-                      <label key={ebook.id} className="checkbox-item">
-                        <input
-                          type="checkbox"
-                          checked={selectedEbooks.includes(ebook.id)}
-                          onChange={() => toggleEbookSelection(ebook.id)}
-                        />
-                        <div className="flex items-center gap-md" style={{ flex: 1 }}>
-                          {ebook.cover_url ? (
-                            <img src={ebook.cover_url} alt="" style={{ width: '32px', height: '42px', objectFit: 'cover', borderRadius: '4px' }} />
-                          ) : (
-                            <div style={{ width: '32px', height: '42px', background: 'var(--bg-tertiary)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem' }}>📖</div>
-                          )}
-                          <div>
-                            <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{ebook.title}</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>R$ {Number(ebook.price).toFixed(2)}</div>
-                          </div>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="modal-footer">
+        <Modal
+          title="Atribuir E-books"
+          onClose={() => !assigning && setShowAssignModal(false)}
+          footer={
+            <>
               <button className="btn btn-secondary" onClick={() => setShowAssignModal(false)} disabled={assigning}>
                 Cancelar
               </button>
@@ -284,9 +230,43 @@ export default function GerenciarEbooksUsuario({ params }) {
                   `Atribuir ${selectedEbooks.length} e-book${selectedEbooks.length !== 1 ? 's' : ''}`
                 )}
               </button>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+        >
+          {availableEbooks.length === 0 ? (
+            <p className="text-secondary">Todos os e-books já foram atribuídos a este cliente.</p>
+          ) : (
+            <>
+              <p className="text-secondary mb-lg" style={{ fontSize: '0.875rem' }}>
+                Selecione os e-books que deseja atribuir a <strong style={{ color: 'var(--text-primary)' }}>{user?.full_name}</strong>:
+              </p>
+              <div className="checkbox-list">
+                {availableEbooks.map((ebook) => (
+                  <label key={ebook.id} className="checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={selectedEbooks.includes(ebook.id)}
+                      onChange={() => toggleEbookSelection(ebook.id)}
+                    />
+                    <div className="flex items-center gap-md" style={{ flex: 1 }}>
+                      {ebook.cover_url ? (
+                        <img src={ebook.cover_url} alt="" className="table-thumbnail-sm" />
+                      ) : (
+                        <div className="table-thumbnail-sm flex items-center justify-center">
+                          <IconBookOpen size={16} />
+                        </div>
+                      )}
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{ebook.title}</div>
+                        <div className="text-tertiary" style={{ fontSize: '0.75rem' }}>R$ {Number(ebook.price).toFixed(2)}</div>
+                      </div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </>
+          )}
+        </Modal>
       )}
     </>
   )

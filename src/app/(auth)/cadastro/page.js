@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import PartnerBadge from '@/components/ui/PartnerBadge'
+import { IconMail } from '@/components/icons'
 
 export default function CadastroPage() {
   const [fullName, setFullName] = useState('')
@@ -13,7 +14,6 @@ export default function CadastroPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -70,10 +70,12 @@ export default function CadastroPage() {
               <span className="text-gradient">Koda</span>Books
             </h1>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: 'var(--space-lg)' }}>✉️</div>
-            <h2 style={{ marginBottom: 'var(--space-md)' }}>Verifique seu e-mail</h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-xl)' }}>
+          <div className="text-center">
+            <div className="landing-feature-icon" style={{ margin: '0 auto var(--space-lg)' }}>
+              <IconMail size={28} />
+            </div>
+            <h2 className="mb-md">Verifique seu e-mail</h2>
+            <p className="text-secondary mb-xl">
               Enviamos um link de confirmação para <strong style={{ color: 'var(--text-primary)' }}>{email}</strong>.
               Clique no link para ativar sua conta.
             </p>
@@ -94,25 +96,14 @@ export default function CadastroPage() {
             <span className="text-gradient">Koda</span>Books
           </h1>
           <p>Crie sua conta gratuita</p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '16px', opacity: 0.9 }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Em parceria com</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <img src="/scorpionbits-logo.png" alt="ScorpionBits Logo" style={{ width: '36px', height: '36px', filter: 'brightness(0) invert(1)' }} />
-              <span style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', letterSpacing: '0.02em' }}>ScorpionBits</span>
-            </div>
+          <div className="flex items-center justify-center mt-md">
+            <PartnerBadge label="Em parceria com" size={36} />
           </div>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit} id="cadastro-form">
           {error && (
-            <div style={{
-              padding: 'var(--space-md)',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--error-soft)',
-              color: 'var(--error)',
-              fontSize: '0.875rem',
-              borderLeft: '3px solid var(--error)',
-            }}>
+            <div className="form-feedback form-feedback-error" style={{ textAlign: 'left', borderLeft: '3px solid var(--error)' }}>
               {error}
             </div>
           )}

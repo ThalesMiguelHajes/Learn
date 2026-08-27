@@ -5,14 +5,16 @@ import { ROLES } from '@/lib/constants'
 export async function getUser() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
+  // getClaims() verifies the session locally (no Auth-server round-trip) when the
+  // project uses asymmetric JWT signing keys, unlike getUser() which always calls out.
+  const { data: claimsData, error: authError } = await supabase.auth.getClaims()
+  const claims = claimsData?.claims
 
-  if (authError || !user) {
+  if (authError || !claims) {
     return { user: null, profile: null }
   }
+
+  const user = { id: claims.sub, email: claims.email, user_metadata: claims.user_metadata }
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')

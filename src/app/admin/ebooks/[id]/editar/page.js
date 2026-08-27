@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, use } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { BUCKETS, MAX_FILE_SIZE, ACCEPTED_COVER_TYPES, ACCEPTED_EBOOK_TYPES } from '@/lib/constants'
+import { IconFileText, IconCheckCircle } from '@/components/icons'
 
 export default function EditarEbookPage({ params }) {
   const { id } = use(params)
@@ -181,18 +182,10 @@ export default function EditarEbookPage({ params }) {
         </div>
       </div>
 
-      <div className="glass-card" style={{ padding: 'var(--space-2xl)', maxWidth: '720px' }}>
+      <div className="glass-card form-panel">
         <form onSubmit={handleSubmit}>
           {error && (
-            <div style={{
-              padding: 'var(--space-md)',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--error-soft)',
-              color: 'var(--error)',
-              fontSize: '0.875rem',
-              borderLeft: '3px solid var(--error)',
-              marginBottom: 'var(--space-lg)',
-            }}>
+            <div className="form-feedback form-feedback-error mb-lg" style={{ textAlign: 'left', borderLeft: '3px solid var(--error)' }}>
               {error}
             </div>
           )}
@@ -236,7 +229,7 @@ export default function EditarEbookPage({ params }) {
           <div className="form-group mb-lg">
             <label className="form-label">Imagem de Capa</label>
             {coverPreview && (
-              <div className="file-preview" style={{ marginBottom: 'var(--space-md)' }}>
+              <div className="file-preview mb-md">
                 <img src={coverPreview} alt="Capa atual" className="file-preview-image" />
                 <div className="file-preview-info">
                   <div className="file-preview-name">{coverFile ? coverFile.name : 'Capa atual'}</div>
@@ -262,8 +255,10 @@ export default function EditarEbookPage({ params }) {
           <div className="form-group mb-lg">
             <label className="form-label">Arquivo do E-book</label>
             {(existingFile || ebookFile) && (
-              <div className="file-preview" style={{ marginBottom: 'var(--space-md)' }}>
-                <div style={{ width: '60px', height: '80px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0 }}>📄</div>
+              <div className="file-preview mb-md">
+                <div className="file-preview-image flex items-center justify-center">
+                  <IconFileText size={24} />
+                </div>
                 <div className="file-preview-info">
                   <div className="file-preview-name">{ebookFile ? ebookFile.name : existingFile?.name}</div>
                   {ebookFile && <div className="file-preview-size">{formatFileSize(ebookFile.size)}</div>}
@@ -303,7 +298,7 @@ export default function EditarEbookPage({ params }) {
 
           <div className="flex gap-md">
             <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-              {loading ? <><span className="spinner" /> Salvando...</> : '✅ Salvar alterações'}
+              {loading ? <><span className="spinner" /> Salvando...</> : <><IconCheckCircle size={16} /> Salvar alterações</>}
             </button>
             <button
               type="button"

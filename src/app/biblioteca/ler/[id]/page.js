@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import PdfReader from '@/components/biblioteca/PdfReader'
 import { redirect } from 'next/navigation'
+import { IconBookOpen } from '@/components/icons'
 
 export async function generateMetadata({ params }) {
   const { id } = await params
@@ -40,8 +41,8 @@ export default async function LerEbookPage({ params }) {
 
   if (!ownership) {
     return (
-      <div className="pdf-error" style={{ height: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="glass-card" style={{ padding: '2rem', textAlign: 'center' }}>
+      <div className="center-message-page">
+        <div className="glass-card center-message-card">
           <h2>Acesso Negado</h2>
           <p>Você não possui acesso a este e-book.</p>
         </div>
@@ -58,8 +59,8 @@ export default async function LerEbookPage({ params }) {
 
   if (!ebook || ebook.file_type !== 'pdf') {
     return (
-      <div className="pdf-error" style={{ height: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="glass-card" style={{ padding: '2rem', textAlign: 'center' }}>
+      <div className="center-message-page">
+        <div className="glass-card center-message-card">
           <h2>Formato não suportado</h2>
           <p>O leitor integrado atualmente suporta apenas arquivos PDF.</p>
         </div>
@@ -69,9 +70,9 @@ export default async function LerEbookPage({ params }) {
 
   return (
     <div className="ler-ebook-page">
-      <div className="page-header" style={{ marginBottom: 'var(--space-md)' }}>
+      <div className="page-header mb-md">
         <div className="page-header-left">
-          <h2>📖 Lendo: <span className="text-gradient">{ebook.title}</span></h2>
+          <h2 className="flex items-center gap-sm"><IconBookOpen size={22} /> Lendo: <span className="text-gradient">{ebook.title}</span></h2>
         </div>
       </div>
 

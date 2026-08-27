@@ -38,7 +38,17 @@ export async function addEbookToPlaylist(playlistId, ebookId) {
     return { error: 'Usuário não autenticado.' }
   }
 
-  // A RLS policy "Usuários gerenciam o vínculo das suas playlists" garante segurança
+  const { data: playlist } = await supabase
+    .from('playlists')
+    .select('id')
+    .eq('id', playlistId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!playlist) {
+    return { error: 'Playlist não encontrada.' }
+  }
+
   const { error } = await supabase
     .from('playlist_ebooks')
     .insert([{ playlist_id: playlistId, ebook_id: ebookId }])

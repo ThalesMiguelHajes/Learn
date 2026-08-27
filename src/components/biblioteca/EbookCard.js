@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { IconBookOpen } from '@/components/icons'
 
 export default function EbookCard({ ebook, index }) {
   return (
-    <Link 
+    <Link
       href={`/biblioteca/livro/${ebook.id}`}
       className="glass-card ebook-card animate-in"
-      style={{ animationDelay: `${index * 80}ms`, textDecoration: 'none', display: 'block', cursor: 'pointer' }}
+      style={{ animationDelay: `${index * 80}ms` }}
     >
       {ebook.cover_url ? (
         <img
@@ -16,14 +17,8 @@ export default function EbookCard({ ebook, index }) {
           className="ebook-card-cover"
         />
       ) : (
-        <div className="ebook-card-cover" style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '3rem',
-          background: 'var(--bg-tertiary)',
-        }}>
-          📖
+        <div className="ebook-card-cover ebook-card-cover-placeholder">
+          <IconBookOpen size={40} />
         </div>
       )}
       <div className="ebook-card-body">

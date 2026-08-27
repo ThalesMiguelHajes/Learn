@@ -3,6 +3,9 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { IconDashboard, IconWallet, IconBooks, IconUsers, IconLink } from '@/components/icons'
+import PartnerBadge from '@/components/ui/PartnerBadge'
+import Avatar from '@/components/ui/Avatar'
 
 export default function AdminSidebar({ profile }) {
   const pathname = usePathname()
@@ -10,11 +13,11 @@ export default function AdminSidebar({ profile }) {
   const supabase = createClient()
 
   const navItems = [
-    { href: '/admin', label: 'Dashboard', icon: '📊' },
-    { href: '/admin/vendas', label: 'Vendas', icon: '💰' },
-    { href: '/admin/ebooks', label: 'E-books', icon: '📚' },
-    { href: '/admin/usuarios', label: 'Usuários', icon: '👥' },
-    { href: '/admin/atribuicoes', label: 'Atribuições', icon: '🔗' },
+    { href: '/admin', label: 'Dashboard', icon: IconDashboard },
+    { href: '/admin/vendas', label: 'Vendas', icon: IconWallet },
+    { href: '/admin/ebooks', label: 'E-books', icon: IconBooks },
+    { href: '/admin/usuarios', label: 'Usuários', icon: IconUsers },
+    { href: '/admin/atribuicoes', label: 'Atribuições', icon: IconLink },
   ]
 
   function isActive(href) {
@@ -28,10 +31,6 @@ export default function AdminSidebar({ profile }) {
     router.refresh()
   }
 
-  const initials = profile?.full_name
-    ? profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-    : 'AD'
-
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -41,9 +40,8 @@ export default function AdminSidebar({ profile }) {
           </span>
           <span className="sidebar-badge">Admin</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', opacity: 0.9 }}>
-          <img src="/scorpionbits-logo.png" alt="ScorpionBits Logo" style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} />
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff', letterSpacing: '0.02em', textTransform: 'uppercase' }}>ScorpionBits</span>
+        <div className="mt-md">
+          <PartnerBadge />
         </div>
       </div>
 
@@ -55,7 +53,7 @@ export default function AdminSidebar({ profile }) {
             href={item.href}
             className={`sidebar-link ${isActive(item.href) ? 'active' : ''}`}
           >
-            <span className="icon">{item.icon}</span>
+            <span className="icon"><item.icon size={18} /></span>
             {item.label}
           </Link>
         ))}
@@ -63,16 +61,15 @@ export default function AdminSidebar({ profile }) {
 
       <div className="sidebar-footer">
         <div className="sidebar-user">
-          <div className="sidebar-user-avatar">{initials}</div>
+          <Avatar name={profile?.full_name} fallback="AD" />
           <div className="sidebar-user-info">
             <div className="sidebar-user-name">{profile?.full_name || 'Admin'}</div>
             <div className="sidebar-user-role">Administrador</div>
           </div>
         </div>
         <button
-          className="btn btn-secondary w-full"
+          className="btn btn-secondary w-full justify-center mt-md"
           onClick={handleLogout}
-          style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8 }}>
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>

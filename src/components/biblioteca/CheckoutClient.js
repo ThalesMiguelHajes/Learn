@@ -40,7 +40,7 @@ export default function CheckoutClient({ ebook, userProfile }) {
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           ebookId: ebook.id,
           cpf: cleanCpf,
           phone: cleanPhone
@@ -75,7 +75,7 @@ export default function CheckoutClient({ ebook, userProfile }) {
   const handleCpfChange = (e) => {
     let value = e.target.value.replace(/\D/g, '')
     if (value.length > 11) value = value.slice(0, 11)
-    
+
     value = value.replace(/(\d{3})(\d)/, '$1.$2')
     value = value.replace(/(\d{3})(\d)/, '$1.$2')
     value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2')
@@ -86,130 +86,82 @@ export default function CheckoutClient({ ebook, userProfile }) {
   const handlePhoneChange = (e) => {
     let value = e.target.value.replace(/\D/g, '')
     if (value.length > 11) value = value.slice(0, 11)
-    
+
     value = value.replace(/^(\d{2})(\d)/g, '($1) $2')
     value = value.replace(/(\d)(\d{4})$/, '$1-$2')
     setPhone(value)
   }
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr',
-      gap: 'var(--space-xl)',
-    }}>
-      <div className="glass-card" style={{ padding: 'var(--space-lg)' }}>
-        <h2 style={{ 
-          fontSize: '1.2rem', 
-          marginBottom: 'var(--space-md)',
-          color: 'var(--text-primary)'
-        }}>
-          Resumo do Pedido
-        </h2>
-        
-        <div style={{ display: 'flex', gap: 'var(--space-md)', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
+    <div className="checkout-layout">
+      <div className="glass-card panel">
+        <h2 className="checkout-section-title">Resumo do Pedido</h2>
+
+        <div className="checkout-summary-item">
           {ebook.cover_url ? (
-            <img 
-              src={ebook.cover_url} 
-              alt={ebook.title} 
-              style={{ width: '80px', height: '110px', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }}
-            />
+            <img src={ebook.cover_url} alt={ebook.title} className="checkout-cover" />
           ) : (
-            <div style={{ width: '80px', height: '110px', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-sm)' }} />
+            <div className="checkout-cover" style={{ background: 'var(--bg-tertiary)' }} />
           )}
           <div>
-            <h3 style={{ fontSize: '1.1rem', margin: '0 0 var(--space-xs) 0', color: 'var(--text-primary)' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: 'var(--space-xs)', color: 'var(--text-primary)' }}>
               {ebook.title}
             </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: 0 }}>
+            <p className="text-secondary" style={{ fontSize: '0.9rem' }}>
               E-book Digital
             </p>
           </div>
         </div>
-        
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          borderTop: '1px solid var(--border-color)', 
-          paddingTop: 'var(--space-md)',
-          fontWeight: 'bold',
-          fontSize: '1.2rem',
-          color: 'var(--text-primary)'
-        }}>
+
+        <div className="checkout-total">
           <span>Total a pagar:</span>
           <span>{priceFormatted}</span>
         </div>
       </div>
 
-      <div className="glass-card" style={{ padding: 'var(--space-lg)' }}>
-        <h2 style={{ 
-          fontSize: '1.2rem', 
-          marginBottom: 'var(--space-sm)',
-          color: 'var(--text-primary)'
-        }}>
-          Dados de Cobrança
-        </h2>
-        <p style={{ color: 'var(--text-tertiary)', fontSize: '0.85rem', marginBottom: 'var(--space-lg)' }}>
+      <div className="glass-card panel">
+        <h2 className="checkout-section-title">Dados de Cobrança</h2>
+        <p className="text-tertiary mb-lg" style={{ fontSize: '0.85rem' }}>
           A AbacatePay exige CPF e Telefone para processar pagamentos via PIX. Seus dados são salvos com segurança.
         </p>
 
-        <form onSubmit={handleCheckout} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: 'var(--space-xs)', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-              CPF
-            </label>
-            <input 
-              type="text" 
+        <form onSubmit={handleCheckout} className="auth-form">
+          <div className="form-group">
+            <label className="form-label">CPF</label>
+            <input
+              type="text"
               required
               value={cpf}
               onChange={handleCpfChange}
               placeholder="000.000.000-00"
               className="form-input"
-              style={{ width: '100%' }}
             />
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: 'var(--space-xs)', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-              Telefone / WhatsApp
-            </label>
-            <input 
-              type="text" 
+          <div className="form-group">
+            <label className="form-label">Telefone / WhatsApp</label>
+            <input
+              type="text"
               required
               value={phone}
               onChange={handlePhoneChange}
               placeholder="(00) 00000-0000"
               className="form-input"
-              style={{ width: '100%' }}
             />
           </div>
 
           {error && (
-            <div style={{ 
-              color: 'var(--error, #f87171)', 
-              fontSize: '0.9rem', 
-              padding: 'var(--space-sm)', 
-              background: 'rgba(248, 113, 113, 0.1)',
-              borderRadius: 'var(--radius-sm)',
-              border: '1px solid rgba(248, 113, 113, 0.2)'
-            }}>
+            <div className="form-feedback form-feedback-error">
               {error}
             </div>
           )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
-            className="btn btn-primary"
-            style={{ 
-              marginTop: 'var(--space-md)', 
-              opacity: loading ? 0.7 : 1, 
-              cursor: loading ? 'wait' : 'pointer',
-              justifyContent: 'center',
-              padding: 'var(--space-sm) var(--space-xl)'
-            }}
+            className="btn btn-primary justify-center mt-md"
           >
-            {loading ? '⏳ Gerando PIX...' : 'Gerar Pagamento PIX'}
+            {loading ? <><span className="spinner" /> Gerando PIX...</> : 'Gerar Pagamento PIX'}
           </button>
         </form>
       </div>

@@ -1,5 +1,14 @@
+import { timingSafeEqual } from 'node:crypto'
 import { createServiceClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+
+function isValidSecret(received, expected) {
+  if (!received || !expected) return false
+  const receivedBuf = Buffer.from(received)
+  const expectedBuf = Buffer.from(expected)
+  if (receivedBuf.length !== expectedBuf.length) return false
+  return timingSafeEqual(receivedBuf, expectedBuf)
+}
 
 // POST /api/webhook/abacatepay
 // Recebe notificações da AbacatePay quando um pagamento é confirmado
@@ -11,11 +20,14 @@ export async function POST(request) {
     const receivedSecret = searchParams.get('webhookSecret')
     const expectedSecret = process.env.ABACATEPAY_WEBHOOK_SECRET
 
-    if (expectedSecret && receivedSecret !== expectedSecret) {
-      console.warn('Webhook recebido com secret inválido. Esperado:', expectedSecret, 'Recebido:', receivedSecret)
+    if (!expectedSecret) {
+      console.error('[AbacatePay Webhook] ABACATEPAY_WEBHOOK_SECRET não configurado — recusando webhook.')
+      return NextResponse.json({ error: 'Webhook não configurado' }, { status: 401 })
+    }
+
+    if (!isValidSecret(receivedSecret, expectedSecret)) {
+      console.warn('[AbacatePay Webhook] Secret inválido recebido.')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    } else if (!expectedSecret) {
-      console.warn('Atenção: ABACATEPAY_WEBHOOK_SECRET não está configurado. Webhook aceito sem validação de segurança.')
     }
 
     // 2. Ler o payload do evento
@@ -48,15 +60,25 @@ export async function POST(request) {
     // 5. Usar a service role para operar sem restrições de RLS
     const supabase = createServiceClient()
 
-    // 6. Verificar se já foi processado (idempotência)
-    const { data: alreadyPaid } = await supabase
+    // 6. Cruzar com o checkout pendente registrado no /api/checkout — o payload do
+    // webhook por si só não é uma prova confiável de quem comprou o quê.
+    const { data: checkout } = await supabase
       .from('pending_checkouts')
-      .select('id, status')
+      .select('id, user_id, ebook_id, status')
       .eq('billing_id', billingId)
-      .eq('status', 'paid')
       .single()
 
-    if (alreadyPaid) {
+    if (!checkout) {
+      console.error('[AbacatePay Webhook] Nenhum pending_checkout encontrado para billing_id:', billingId)
+      return NextResponse.json({ error: 'Checkout não encontrado' }, { status: 404 })
+    }
+
+    if (checkout.user_id !== userId || checkout.ebook_id !== ebookId) {
+      console.error('[AbacatePay Webhook] Metadata não confere com o pending_checkout registrado:', { billingId, checkout, userId, ebookId })
+      return NextResponse.json({ error: 'Metadata inconsistente' }, { status: 400 })
+    }
+
+    if (checkout.status === 'paid') {
       console.log('[AbacatePay Webhook] Evento duplicado ignorado:', billingId)
       return NextResponse.json({ received: true, processed: false, reason: 'duplicate' })
     }

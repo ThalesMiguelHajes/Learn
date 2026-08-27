@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { getUserPlaylists, createPlaylist, addEbookToPlaylist } from '@/app/actions/playlists'
+import Modal from '@/components/ui/Modal'
+import { IconFolderPlus } from '@/components/icons'
 
 export default function AddToPlaylistModal({ ebookId, onClose }) {
   const [playlists, setPlaylists] = useState([])
@@ -29,7 +31,7 @@ export default function AddToPlaylistModal({ ebookId, onClose }) {
     e.preventDefault()
     setCreating(true)
     setFeedback(null)
-    
+
     const res = await createPlaylist(newTitle)
     if (res.success) {
       setNewTitle('')
@@ -56,123 +58,54 @@ export default function AddToPlaylistModal({ ebookId, onClose }) {
   }
 
   return (
-    <div style={styles.overlay}>
-      <div className="glass-card" style={styles.modal}>
-        <div style={styles.header}>
-          <h3>Adicionar à Playlist</h3>
-          <button onClick={onClose} style={styles.closeBtn}>&times;</button>
+    <Modal title="Adicionar à Playlist" onClose={onClose} maxWidth="400px">
+      {feedback && (
+        <div className={`form-feedback form-feedback-${feedback.type} mb-md`}>
+          {feedback.msg}
         </div>
+      )}
 
-        {feedback && (
-          <div style={{
-            padding: 'var(--space-sm)',
-            borderRadius: 'var(--radius-sm)',
-            background: feedback.type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'var(--error-soft)',
-            color: feedback.type === 'success' ? '#4ade80' : 'var(--error)',
-            marginBottom: 'var(--space-md)',
-            textAlign: 'center',
-            fontSize: '0.9rem'
-          }}>
-            {feedback.msg}
-          </div>
-        )}
+      {loading ? (
+        <div className="flex justify-center" style={{ padding: 'var(--space-lg) 0' }}>
+          <span className="spinner" />
+        </div>
+      ) : (
+        <div className="flex flex-col gap-sm" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+          {playlists.length === 0 ? (
+            <p className="text-secondary text-center" style={{ padding: 'var(--space-md) 0' }}>
+              Você ainda não tem playlists.
+            </p>
+          ) : (
+            playlists.map((pl) => (
+              <div key={pl.id} className="flex justify-between items-center" style={{ padding: 'var(--space-sm) var(--space-md)', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
+                <span>{pl.title}</span>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleAdd(pl.id)}
+                >
+                  Adicionar
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
-        {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-lg) 0' }}>
-            <span className="spinner"></span>
-          </div>
-        ) : (
-          <div style={styles.list}>
-            {playlists.length === 0 ? (
-              <p className="text-secondary" style={{ textAlign: 'center', padding: 'var(--space-md) 0' }}>
-                Você ainda não tem playlists.
-              </p>
-            ) : (
-              playlists.map((pl) => (
-                <div key={pl.id} style={styles.playlistItem}>
-                  <span>{pl.title}</span>
-                  <button 
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => handleAdd(pl.id)}
-                  >
-                    +
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        <form onSubmit={handleCreatePlaylist} style={styles.createForm}>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Nome da nova playlist..."
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            required
-            style={{ flex: 1 }}
-          />
-          <button type="submit" className="btn btn-primary" disabled={creating || !newTitle.trim()}>
-            {creating ? <span className="spinner spinner-sm"></span> : 'Criar'}
-          </button>
-        </form>
-      </div>
-    </div>
+      <form onSubmit={handleCreatePlaylist} className="flex gap-sm mt-md" style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: 'var(--space-md)' }}>
+        <input
+          type="text"
+          className="form-input"
+          placeholder="Nome da nova playlist..."
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          required
+          style={{ flex: 1 }}
+        />
+        <button type="submit" className="btn btn-primary" disabled={creating || !newTitle.trim()}>
+          {creating ? <span className="spinner" /> : <IconFolderPlus size={18} />}
+        </button>
+      </form>
+    </Modal>
   )
-}
-
-const styles = {
-  overlay: {
-    position: 'fixed',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    backdropFilter: 'blur(4px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 9999
-  },
-  modal: {
-    width: '90%',
-    maxWidth: '400px',
-    padding: 'var(--space-lg)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'var(--space-md)'
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  closeBtn: {
-    background: 'transparent',
-    border: 'none',
-    color: 'var(--text-secondary)',
-    fontSize: '1.5rem',
-    cursor: 'pointer'
-  },
-  list: {
-    maxHeight: '200px',
-    overflowY: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'var(--space-sm)'
-  },
-  playlistItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 'var(--space-sm) var(--space-md)',
-    background: 'var(--bg-tertiary)',
-    borderRadius: 'var(--radius-md)'
-  },
-  createForm: {
-    display: 'flex',
-    gap: 'var(--space-sm)',
-    marginTop: 'var(--space-sm)',
-    borderTop: '1px solid var(--border-subtle)',
-    paddingTop: 'var(--space-md)'
-  }
 }

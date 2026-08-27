@@ -15,6 +15,17 @@ export async function POST(request) {
       return NextResponse.json({ error: 'CPF e Telefone são obrigatórios.' }, { status: 400 })
     }
 
+    const cpfDigits = String(cpf).replace(/\D/g, '')
+    const phoneDigits = String(phone).replace(/\D/g, '')
+
+    if (cpfDigits.length !== 11) {
+      return NextResponse.json({ error: 'CPF inválido.' }, { status: 400 })
+    }
+
+    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+      return NextResponse.json({ error: 'Telefone inválido.' }, { status: 400 })
+    }
+
     // 1. Autenticar o usuário via sessão (cookie SSR)
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -54,7 +65,7 @@ export async function POST(request) {
     // E já atualiza o CPF e Telefone no banco
     const { data: profile, error: updateError } = await supabase
       .from('profiles')
-      .update({ cpf, phone })
+      .update({ cpf: cpfDigits, phone: phoneDigits })
       .eq('id', user.id)
       .select('full_name, email, cpf, phone')
       .single()

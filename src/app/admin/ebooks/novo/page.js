@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { BUCKETS, MAX_FILE_SIZE, ACCEPTED_COVER_TYPES, ACCEPTED_EBOOK_TYPES } from '@/lib/constants'
+import { IconImage, IconFileText, IconX, IconBooks } from '@/components/icons'
 
 export default function NovoEbookPage() {
   const [title, setTitle] = useState('')
@@ -135,18 +136,10 @@ export default function NovoEbookPage() {
         </div>
       </div>
 
-      <div className="glass-card" style={{ padding: 'var(--space-2xl)', maxWidth: '720px' }}>
+      <div className="glass-card form-panel">
         <form onSubmit={handleSubmit} id="ebook-form">
           {error && (
-            <div style={{
-              padding: 'var(--space-md)',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--error-soft)',
-              color: 'var(--error)',
-              fontSize: '0.875rem',
-              borderLeft: '3px solid var(--error)',
-              marginBottom: 'var(--space-lg)',
-            }}>
+            <div className="form-feedback form-feedback-error mb-lg" style={{ textAlign: 'left', borderLeft: '3px solid var(--error)' }}>
               {error}
             </div>
           )}
@@ -200,7 +193,7 @@ export default function NovoEbookPage() {
                 onChange={handleCoverSelect}
                 style={{ display: 'none' }}
               />
-              <div className="upload-icon">🖼️</div>
+              <div className="upload-icon"><IconImage size={32} /></div>
               <div className="upload-text">
                 Clique para selecionar ou <strong>arraste a imagem</strong>
               </div>
@@ -218,7 +211,7 @@ export default function NovoEbookPage() {
                   className="btn btn-ghost btn-sm"
                   onClick={() => { setCoverFile(null); setCoverPreview(null) }}
                 >
-                  ✕
+                  <IconX size={16} />
                 </button>
               </div>
             )}
@@ -234,7 +227,7 @@ export default function NovoEbookPage() {
                 onChange={handleEbookSelect}
                 style={{ display: 'none' }}
               />
-              <div className="upload-icon">📄</div>
+              <div className="upload-icon"><IconFileText size={32} /></div>
               <div className="upload-text">
                 Clique para selecionar ou <strong>arraste o arquivo</strong>
               </div>
@@ -242,8 +235,8 @@ export default function NovoEbookPage() {
             </div>
             {ebookFile && (
               <div className="file-preview">
-                <div style={{ width: '60px', height: '80px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0 }}>
-                  📄
+                <div className="file-preview-image flex items-center justify-center">
+                  <IconFileText size={24} />
                 </div>
                 <div className="file-preview-info">
                   <div className="file-preview-name">{ebookFile.name}</div>
@@ -254,7 +247,7 @@ export default function NovoEbookPage() {
                   className="btn btn-ghost btn-sm"
                   onClick={() => setEbookFile(null)}
                 >
-                  ✕
+                  <IconX size={16} />
                 </button>
               </div>
             )}
@@ -278,7 +271,7 @@ export default function NovoEbookPage() {
               disabled={loading}
               id="ebook-submit"
             >
-              {loading ? <><span className="spinner" /> Salvando...</> : '📚 Criar E-book'}
+              {loading ? <><span className="spinner" /> Salvando...</> : <><IconBooks size={16} /> Criar E-book</>}
             </button>
             <button
               type="button"

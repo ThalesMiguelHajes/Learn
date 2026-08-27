@@ -1,7 +1,9 @@
 'use client'
 
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'
+import PartnerBadge from '@/components/ui/PartnerBadge'
 
 export default function ClientHeader({ profile }) {
   const supabase = createClient()
@@ -22,25 +24,22 @@ export default function ClientHeader({ profile }) {
           <span className="text-gradient">Koda</span>Books
         </div>
         <div className="biblioteca-header-divider"></div>
-        <div className="biblioteca-header-partner">
-          <img src="/scorpionbits-logo.png" alt="ScorpionBits Logo" className="partner-logo" />
-          <span className="partner-name">ScorpionBits</span>
-        </div>
+        <PartnerBadge size={24} />
       </div>
 
       <nav className="biblioteca-header-nav">
-        <a 
-          href="/biblioteca" 
+        <Link
+          href="/biblioteca"
           className={`nav-link ${pathname === '/biblioteca' ? 'active' : ''}`}
         >
           Minha Biblioteca
-        </a>
-        <a 
-          href="/biblioteca/catalogo" 
+        </Link>
+        <Link
+          href="/biblioteca/catalogo"
           className={`nav-link ${pathname === '/biblioteca/catalogo' ? 'active' : ''}`}
         >
           Catálogo
-        </a>
+        </Link>
       </nav>
 
       <div className="biblioteca-header-right">
