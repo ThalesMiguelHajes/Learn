@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import CatalogCard from '@/components/biblioteca/CatalogCard'
 import SearchBar from '@/components/biblioteca/SearchBar'
 import { Suspense } from 'react'
+import { IconSearch } from '@/components/icons'
 
 export const metadata = {
   title: 'Catálogo — KodaBooks',
@@ -52,22 +53,16 @@ export default async function CatalogoPage({ searchParams }) {
       </Suspense>
 
       {error && (
-        <div className="toast-error" style={{
-          padding: 'var(--space-md)',
-          borderRadius: 'var(--radius-md)',
-          background: 'var(--error-soft)',
-          color: 'var(--error)',
-          marginBottom: 'var(--space-lg)'
-        }}>
+        <div className="form-feedback form-feedback-error mb-lg">
           Erro ao carregar o catálogo.
         </div>
       )}
 
       {!ebooks || ebooks.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-icon">🔍</div>
-          <h3>Nenhum resultado</h3>
-          <p>Não encontramos nenhum e-book correspondente a "{q}". Tente outros termos!</p>
+          <div className="empty-icon"><IconSearch size={40} /></div>
+          <h3>{q ? 'Nenhum resultado' : 'Nenhum e-book disponível'}</h3>
+          <p>{q ? `Não encontramos nenhum e-book correspondente a "${q}". Tente outros termos!` : 'Ainda não há e-books publicados no catálogo.'}</p>
         </div>
       ) : (
         <div className="ebook-grid">
