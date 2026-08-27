@@ -33,15 +33,17 @@ export async function POST(request) {
     }
 
     // 4. Extrair metadata com os IDs do nosso sistema
-    const { userId, ebookId } = data?.metadata || {}
+    // Na API v1 da AbacatePay, os dados ficam dentro de data.billing
+    const billingData = data?.billing || data || {}
+    const { userId, ebookId } = billingData?.metadata || {}
 
     if (!userId || !ebookId) {
-      console.error('[AbacatePay Webhook] metadata incompleto:', data?.metadata)
+      console.error('[AbacatePay Webhook] metadata incompleto:', billingData?.metadata)
       return NextResponse.json({ error: 'Metadata inválido' }, { status: 400 })
     }
 
-    const billingId = data?.id
-    const totalAmount = (data?.amount || 0) / 100 // AbacatePay retorna em centavos
+    const billingId = billingData?.id
+    const totalAmount = (billingData?.amount || 0) / 100 // AbacatePay retorna em centavos
 
     // 5. Usar a service role para operar sem restrições de RLS
     const supabase = createServiceClient()
