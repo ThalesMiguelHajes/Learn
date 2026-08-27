@@ -43,11 +43,11 @@ export default async function CatalogoPage({ searchParams }) {
       <div className="page-header">
         <div>
           <h2>Catálogo de E-books</h2>
-          <p className="text-secondary">Descubra novos conteúdos para expandir sua biblioteca digital.</p>
+          <p className="text-secondary">O que você vai aprender hoje? Escolha seu próximo e-book.</p>
         </div>
       </div>
       
-      <Suspense fallback={<div style={{height: '80px'}}>Carregando busca...</div>}>
+      <Suspense fallback={<div className="loading-page" style={{minHeight: '40vh'}}><img src="/scorpionbits-logo.png" alt="Carregando" className="loading-logo-pulse" /></div>}>
         <SearchBar placeholder="Buscar no catálogo..." />
       </Suspense>
 
