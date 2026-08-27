@@ -164,7 +164,7 @@ export default function CheckoutClient({ ebook, userProfile }) {
               value={cpf}
               onChange={handleCpfChange}
               placeholder="000.000.000-00"
-              className="input-field"
+              className="form-input"
               style={{ width: '100%' }}
             />
           </div>
@@ -179,7 +179,7 @@ export default function CheckoutClient({ ebook, userProfile }) {
               value={phone}
               onChange={handlePhoneChange}
               placeholder="(00) 00000-0000"
-              className="input-field"
+              className="form-input"
               style={{ width: '100%' }}
             />
           </div>
