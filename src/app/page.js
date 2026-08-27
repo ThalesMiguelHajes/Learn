@@ -32,9 +32,16 @@ export default async function LandingPage() {
         top: 0,
         zIndex: 100,
       }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 800 }}>
-          <span className="text-gradient">Koda</span>Books
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 800 }}>
+            <span className="text-gradient">Koda</span>Books
+          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', opacity: 0.8, borderLeft: '1px solid var(--border-default)', paddingLeft: 'var(--space-md)' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>by</span>
+            <img src="/scorpionbits-logo.png" alt="ScorpionBits" style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} />
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff' }}>ScorpionBits</span>
+          </div>
+        </div>
         <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
           <Link href="/login" className="btn btn-secondary">
             Entrar
