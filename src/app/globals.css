@@ -2,61 +2,61 @@
 
 /* ============================================================
    KODABOOKS — DESIGN SYSTEM
-   Premium dark theme with glassmorphism & vibrant accents
+   Light, professional theme — soft neutrals with an indigo/violet accent
    ============================================================ */
 
 :root {
-  /* Colors — Dark Theme */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #111118;
-  --bg-tertiary: #1a1a24;
-  --bg-elevated: #22222e;
-  --bg-glass: rgba(255, 255, 255, 0.04);
-  --bg-glass-hover: rgba(255, 255, 255, 0.07);
-  --bg-glass-strong: rgba(255, 255, 255, 0.10);
+  /* Colors — Light Theme */
+  --bg-primary: #f7f8fb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f2f8;
+  --bg-elevated: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  --bg-glass-hover: rgba(255, 255, 255, 0.92);
+  --bg-glass-strong: #ffffff;
 
-  /* Accent — Vibrant blue gradient (ScorpionBits reference) */
-  --accent-primary: #2563eb;
-  --accent-secondary: #60a5fa;
-  --accent-tertiary: #93c5fd;
-  --accent-glow: rgba(37, 99, 235, 0.25);
-  --accent-gradient: linear-gradient(135deg, #3b82f6, #2563eb, #1d4ed8);
-  --accent-gradient-hover: linear-gradient(135deg, #60a5fa, #3b82f6, #2563eb);
-  --accent-gradient-soft: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(29, 78, 216, 0.08));
+  /* Accent — Indigo → violet gradient */
+  --accent-primary: #6366f1;
+  --accent-secondary: #8b5cf6;
+  --accent-tertiary: #a78bfa;
+  --accent-glow: rgba(99, 102, 241, 0.18);
+  --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --accent-gradient-hover: linear-gradient(135deg, #7577f4, #9c6ff8);
+  --accent-gradient-soft: linear-gradient(135deg, rgba(99, 102, 241, 0.10), rgba(139, 92, 246, 0.06));
 
   /* Complementary accent — Cyan/Teal */
   --accent-alt: #06b6d4;
-  --accent-alt-soft: rgba(6, 182, 212, 0.15);
+  --accent-alt-soft: rgba(6, 182, 212, 0.10);
 
   /* Text */
-  --text-primary: #f1f0f5;
-  --text-secondary: #a3a0b5;
-  --text-tertiary: #6b6880;
-  --text-inverse: #0a0a0f;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --text-inverse: #ffffff;
 
   /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.10);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --border-accent: rgba(37, 99, 235, 0.40);
+  --border-subtle: #eef0f5;
+  --border-default: #e4e7ee;
+  --border-strong: #d1d5e0;
+  --border-accent: rgba(99, 102, 241, 0.35);
 
   /* Feedback */
-  --success: #22c55e;
-  --success-soft: rgba(34, 197, 94, 0.12);
-  --warning: #f59e0b;
-  --warning-soft: rgba(245, 158, 11, 0.12);
-  --error: #ef4444;
-  --error-soft: rgba(239, 68, 68, 0.12);
-  --info: #3b82f6;
-  --info-soft: rgba(59, 130, 246, 0.12);
+  --success: #16a34a;
+  --success-soft: rgba(22, 163, 74, 0.10);
+  --warning: #d97706;
+  --warning-soft: rgba(217, 119, 6, 0.10);
+  --error: #dc2626;
+  --error-soft: rgba(220, 38, 38, 0.10);
+  --info: #2563eb;
+  --info-soft: rgba(37, 99, 235, 0.10);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 40px rgba(37, 99, 235, 0.15);
-  --shadow-glow-strong: 0 0 60px rgba(37, 99, 235, 0.25);
+  /* Shadows — soft, low-contrast (light surfaces) */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 4px 10px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.05);
+  --shadow-lg: 0 12px 24px rgba(16, 24, 40, 0.08);
+  --shadow-xl: 0 20px 40px rgba(16, 24, 40, 0.10);
+  --shadow-glow: 0 0 24px rgba(99, 102, 241, 0.15);
+  --shadow-glow-strong: 0 0 32px rgba(99, 102, 241, 0.20);
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -164,26 +164,23 @@ h4 { font-size: 1.125rem; }
    ============================================================ */
 
 .glass-card {
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
 }
 
 .glass-card:hover {
-  background: var(--bg-glass-hover);
   border-color: var(--border-default);
   box-shadow: var(--shadow-md);
 }
 
 .glass-card-strong {
-  background: var(--bg-glass-strong);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 /* ============================================================
@@ -223,14 +220,13 @@ h4 { font-size: 1.125rem; }
 }
 
 .partner-badge-logo {
-  filter: brightness(0) invert(1);
   display: block;
 }
 
 .partner-badge-name {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   letter-spacing: 0.02em;
 }
 
@@ -295,8 +291,8 @@ h4 { font-size: 1.125rem; }
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #dc2626;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+  background: #b91c1c;
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
@@ -1032,26 +1028,6 @@ h4 { font-size: 1.125rem; }
   background: var(--border-default);
 }
 
-.biblioteca-header-partner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 0.9;
-}
-
-.partner-logo {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) invert(1);
-}
-
-.partner-name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.02em;
-}
-
 .biblioteca-header-nav {
   display: flex;
   gap: 8px;
@@ -1117,8 +1093,8 @@ h4 { font-size: 1.125rem; }
 }
 
 .ebook-card:hover {
-  transform: perspective(1000px) rotateX(4deg) rotateY(-4deg) scale3d(1.03, 1.03, 1.03);
-  box-shadow: -10px 10px 20px rgba(0,0,0,0.5), var(--shadow-glow-strong);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
   border-color: var(--border-accent);
 }
 
@@ -1534,19 +1510,18 @@ h4 { font-size: 1.125rem; }
   width: 60px;
   height: 60px;
   animation: pulseLogo 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  filter: brightness(0) invert(1); /* deixa a logo branca */
 }
 
 @keyframes pulseLogo {
   0%, 100% {
     opacity: 1;
     transform: scale(1);
-    filter: brightness(0) invert(1) drop-shadow(0 0 10px var(--accent-primary));
+    filter: drop-shadow(0 0 10px var(--accent-glow));
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.6;
     transform: scale(0.95);
-    filter: brightness(0) invert(1) drop-shadow(0 0 0px var(--accent-primary));
+    filter: drop-shadow(0 0 0px var(--accent-glow));
   }
 }
 
@@ -1866,13 +1841,13 @@ h4 { font-size: 1.125rem; }
   display: flex;
   justify-content: center;
   padding: var(--space-lg);
-  background: #2a2a35; /* Slightly lighter than bg-primary for contrast with paper */
+  background: #dde1e8; /* Neutral gray behind white pages for contrast */
 }
 
 /* Make react-pdf canvas centered and cast a shadow */
 .react-pdf__Page__canvas {
   margin: 0 auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.18);
   border-radius: 4px;
 }
 
@@ -1953,7 +1928,7 @@ h4 { font-size: 1.125rem; }
   flex: 0 0 300px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-xl);
   background: var(--bg-tertiary);
   aspect-ratio: 2 / 3;
 }
