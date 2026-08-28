@@ -17,9 +17,11 @@ export default async function UsuariosPage({ searchParams }) {
   const to = from + PAGE_SIZE - 1
 
   const supabase = await createClient()
+  // profiles recebe duas FKs de user_ebooks (user_id e assigned_by), então o nome da
+  // constraint precisa ser explícito — sem isso o PostgREST recusa o embed por ambiguidade.
   let query = supabase
     .from('profiles')
-    .select('*, user_ebooks(count)', { count: 'exact' })
+    .select('*, user_ebooks!user_ebooks_user_id_fkey(count)', { count: 'exact' })
     .eq('role', 'cliente')
     .order('created_at', { ascending: false })
 
@@ -27,7 +29,11 @@ export default async function UsuariosPage({ searchParams }) {
     query = query.or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
   }
 
-  const { data: usuarios, count } = await query.range(from, to)
+  const { data: usuarios, count, error } = await query.range(from, to)
+
+  if (error) {
+    console.error('Erro ao buscar usuários:', error)
+  }
 
   return (
     <>
@@ -41,6 +47,12 @@ export default async function UsuariosPage({ searchParams }) {
       <Suspense fallback={<div className="search-bar mb-lg" />}>
         <SearchBar placeholder="Buscar por nome ou e-mail..." />
       </Suspense>
+
+      {error && (
+        <div className="form-feedback form-feedback-error mb-lg">
+          Erro ao carregar usuários. Tente recarregar a página.
+        </div>
+      )}
 
       {!usuarios || usuarios.length === 0 ? (
         <div className="empty-state">
