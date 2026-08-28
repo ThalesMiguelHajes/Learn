@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Avatar from '@/components/ui/Avatar'
 import Modal from '@/components/ui/Modal'
-import { IconArrowLeft, IconPlus, IconTrash, IconBookOpen, IconBooks } from '@/components/icons'
+import { IconArrowLeft, IconPlus, IconTrash, IconBookOpen, IconBooks, IconSearch } from '@/components/icons'
 
 export default function GerenciarEbooksUsuario({ params }) {
   const { id: userId } = use(params)
@@ -18,6 +18,7 @@ export default function GerenciarEbooksUsuario({ params }) {
   const [removing, setRemoving] = useState(null)
   const [selectedEbooks, setSelectedEbooks] = useState([])
   const [showAssignModal, setShowAssignModal] = useState(false)
+  const [ebookSearch, setEbookSearch] = useState('')
   const supabase = createClient()
   const router = useRouter()
 
@@ -56,6 +57,9 @@ export default function GerenciarEbooksUsuario({ params }) {
 
   const assignedIds = assignedEbooks.map(a => a.ebook_id)
   const availableEbooks = allEbooks.filter(e => !assignedIds.includes(e.id))
+  const filteredAvailableEbooks = ebookSearch.trim()
+    ? availableEbooks.filter(e => e.title.toLowerCase().includes(ebookSearch.trim().toLowerCase()))
+    : availableEbooks
 
   function toggleEbookSelection(ebookId) {
     setSelectedEbooks(prev =>
@@ -82,6 +86,7 @@ export default function GerenciarEbooksUsuario({ params }) {
       if (error) throw error
 
       setSelectedEbooks([])
+      setEbookSearch('')
       setShowAssignModal(false)
       await fetchData()
     } catch (err) {
@@ -214,10 +219,10 @@ export default function GerenciarEbooksUsuario({ params }) {
       {showAssignModal && (
         <Modal
           title="Atribuir E-books"
-          onClose={() => !assigning && setShowAssignModal(false)}
+          onClose={() => { if (!assigning) { setShowAssignModal(false); setEbookSearch('') } }}
           footer={
             <>
-              <button className="btn btn-secondary" onClick={() => setShowAssignModal(false)} disabled={assigning}>
+              <button className="btn btn-secondary" onClick={() => { setShowAssignModal(false); setEbookSearch('') }} disabled={assigning}>
                 Cancelar
               </button>
               <button
@@ -241,8 +246,22 @@ export default function GerenciarEbooksUsuario({ params }) {
               <p className="text-secondary mb-lg" style={{ fontSize: '0.875rem' }}>
                 Selecione os e-books que deseja atribuir a <strong style={{ color: 'var(--text-primary)' }}>{user?.full_name}</strong>:
               </p>
+              <div className="search-bar mb-sm">
+                <span className="search-icon"><IconSearch size={16} /></span>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Buscar e-book..."
+                  value={ebookSearch}
+                  onChange={(e) => setEbookSearch(e.target.value)}
+                />
+              </div>
               <div className="checkbox-list">
-                {availableEbooks.map((ebook) => (
+                {filteredAvailableEbooks.length === 0 ? (
+                  <p className="text-tertiary" style={{ padding: 'var(--space-sm)', textAlign: 'center', fontSize: '0.875rem' }}>
+                    Nenhum e-book encontrado.
+                  </p>
+                ) : filteredAvailableEbooks.map((ebook) => (
                   <label key={ebook.id} className="checkbox-item">
                     <input
                       type="checkbox"

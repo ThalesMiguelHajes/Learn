@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { createSale } from '@/app/actions/sales'
 import Modal from '@/components/ui/Modal'
+import Combobox from '@/components/ui/Combobox'
+import { IconSearch } from '@/components/icons'
 
 export default function NovaVendaModal({ users, ebooks, onClose }) {
   const [loading, setLoading] = useState(false)
@@ -11,6 +13,18 @@ export default function NovaVendaModal({ users, ebooks, onClose }) {
   const [selectedUser, setSelectedUser] = useState('')
   const [selectedEbooks, setSelectedEbooks] = useState([])
   const [amount, setAmount] = useState('')
+  const [ebookSearch, setEbookSearch] = useState('')
+
+  const userOptions = useMemo(
+    () => users.map(u => ({ value: u.id, label: `${u.full_name} (${u.email})` })),
+    [users]
+  )
+
+  const filteredEbooks = useMemo(() => {
+    if (!ebookSearch.trim()) return ebooks
+    const term = ebookSearch.trim().toLowerCase()
+    return ebooks.filter(e => e.title.toLowerCase().includes(term))
+  }, [ebooks, ebookSearch])
 
   function handleEbookToggle(id) {
     if (selectedEbooks.includes(id)) {
@@ -53,34 +67,44 @@ export default function NovaVendaModal({ users, ebooks, onClose }) {
       <form onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">
           <label className="form-label">Cliente (Comprador)</label>
-          <select
-            className="form-input"
+          <Combobox
+            options={userOptions}
             value={selectedUser}
-            onChange={(e) => setSelectedUser(e.target.value)}
-            required
-          >
-            <option value="">Selecione um cliente...</option>
-            {users.map(u => (
-              <option key={u.id} value={u.id}>
-                {u.full_name} ({u.email})
-              </option>
-            ))}
-          </select>
+            onChange={setSelectedUser}
+            placeholder="Digite para buscar um cliente..."
+            emptyLabel="Nenhum cliente encontrado."
+          />
         </div>
 
         <div className="form-group">
           <label className="form-label">E-books Vendidos</label>
+          <div className="search-bar mb-sm">
+            <span className="search-icon"><IconSearch size={16} /></span>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Buscar e-book..."
+              value={ebookSearch}
+              onChange={(e) => setEbookSearch(e.target.value)}
+            />
+          </div>
           <div className="checkbox-list" style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', maxHeight: '150px' }}>
-            {ebooks.map(ebook => (
-              <label key={ebook.id} className="checkbox-item">
-                <input
-                  type="checkbox"
-                  checked={selectedEbooks.includes(ebook.id)}
-                  onChange={() => handleEbookToggle(ebook.id)}
-                />
-                <span>{ebook.title}</span>
-              </label>
-            ))}
+            {filteredEbooks.length === 0 ? (
+              <p className="text-tertiary" style={{ padding: 'var(--space-sm)', textAlign: 'center', fontSize: '0.875rem' }}>
+                Nenhum e-book encontrado.
+              </p>
+            ) : (
+              filteredEbooks.map(ebook => (
+                <label key={ebook.id} className="checkbox-item">
+                  <input
+                    type="checkbox"
+                    checked={selectedEbooks.includes(ebook.id)}
+                    onChange={() => handleEbookToggle(ebook.id)}
+                  />
+                  <span>{ebook.title}</span>
+                </label>
+              ))
+            )}
           </div>
         </div>
 

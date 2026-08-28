@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { IconDashboard, IconWallet, IconBooks, IconUsers, IconLink } from '@/components/icons'
+import { IconDashboard, IconWallet, IconBooks, IconUsers, IconLink, IconSettings } from '@/components/icons'
 import PartnerBadge from '@/components/ui/PartnerBadge'
 import Avatar from '@/components/ui/Avatar'
 
@@ -18,6 +18,7 @@ export default function AdminSidebar({ profile }) {
     { href: '/admin/ebooks', label: 'E-books', icon: IconBooks },
     { href: '/admin/usuarios', label: 'Usuários', icon: IconUsers },
     { href: '/admin/atribuicoes', label: 'Atribuições', icon: IconLink },
+    { href: '/admin/configuracoes', label: 'Configurações', icon: IconSettings },
   ]
 
   function isActive(href) {

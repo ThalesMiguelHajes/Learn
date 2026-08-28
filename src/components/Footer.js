@@ -27,8 +27,8 @@ export default function Footer() {
           <h3 className="site-footer-heading">Legal e Contato</h3>
           <ul className="site-footer-links">
             <li><a href="mailto:scorpionbits.contato@gmail.com">Contato</a></li>
-            <li><a href="#">Termos de Uso</a></li>
-            <li><a href="#">Política de Privacidade</a></li>
+            <li><Link href="/termos">Termos de Uso</Link></li>
+            <li><Link href="/privacidade">Política de Privacidade</Link></li>
           </ul>
         </div>
       </div>

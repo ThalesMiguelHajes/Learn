@@ -12,10 +12,21 @@ export const viewport = {
   maximumScale: 1,
 }
 
+const THEME_INIT_SCRIPT = `
+try {
+  var t = localStorage.getItem('kodabooks-theme');
+  if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+} catch (e) {}
+`
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-BR">
-      <body>{children}</body>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body>
+        {/* Runs before paint so a saved light-mode preference doesn't flash dark first. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {children}
+      </body>
     </html>
   )
 }

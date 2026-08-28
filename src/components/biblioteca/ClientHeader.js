@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'
 import PartnerBadge from '@/components/ui/PartnerBadge'
+import { IconSettings } from '@/components/icons'
 
 export default function ClientHeader({ profile }) {
   const supabase = createClient()
@@ -46,7 +47,14 @@ export default function ClientHeader({ profile }) {
         <span className="biblioteca-header-user">
           Olá, <strong>{profile?.full_name?.split(' ')[0] || 'Usuário'}</strong>
         </span>
-        <button 
+        <Link
+          href="/biblioteca/configuracoes"
+          className={`btn btn-secondary btn-icon ${pathname === '/biblioteca/configuracoes' ? 'active' : ''}`}
+          title="Configurações"
+        >
+          <IconSettings size={16} />
+        </Link>
+        <button
           className="btn btn-secondary btn-sm logout-btn" 
           onClick={handleLogout}
         >
