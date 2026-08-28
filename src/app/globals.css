@@ -12,9 +12,9 @@
   --bg-secondary: #121219;
   --bg-tertiary: #1b1b26;
   --bg-elevated: #23232f;
-  --bg-glass: rgba(255, 255, 255, 0.05);
-  --bg-glass-hover: rgba(255, 255, 255, 0.08);
-  --bg-glass-strong: rgba(255, 255, 255, 0.12);
+  --bg-glass: rgba(255, 255, 255, 0.07);
+  --bg-glass-hover: rgba(255, 255, 255, 0.11);
+  --bg-glass-strong: rgba(255, 255, 255, 0.14);
 
   /* Accent — Indigo → violet gradient */
   --accent-primary: #6366f1;
@@ -169,7 +169,10 @@ h4 { font-size: 1.125rem; }
    once would tank scroll performance on phones. */
 .glass-card {
   background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-subtle);
+  border-top-color: var(--border-default);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
@@ -185,9 +188,10 @@ h4 { font-size: 1.125rem; }
    modals) where there's only ever one or two on screen at a time. */
 .glass-card-strong {
   background: var(--bg-glass-strong);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-default);
+  border-top-color: var(--border-strong);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
 }
