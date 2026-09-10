@@ -21,7 +21,7 @@ export default async function VendasPage({ searchParams }) {
   // 1. Buscar a página atual de vendas (sem join direto no profiles porque a FK aponta para auth.users)
   const { data: rawSales, count, error: salesError } = await supabase
     .from('sales')
-    .select('*, sale_items(ebook_id)', { count: 'exact' })
+    .select('*, sale_items(item_id, item_type)', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(from, to)
 
@@ -56,6 +56,15 @@ export default async function VendasPage({ searchParams }) {
     .eq('is_active', true)
     .order('title')
 
+  const { data: materials } = await supabase
+    .from('materials')
+    .select('id, title, is_active')
+    .eq('is_active', true)
+    .order('title')
+
+  // We'll add courses later
+  const courses = []
+
   return (
     <div className="admin-vendas-page">
       {salesError && (
@@ -67,7 +76,11 @@ export default async function VendasPage({ searchParams }) {
         sales={sales}
         totalRevenue={totalRevenue}
         users={users || []}
-        ebooks={ebooks || []}
+        products={{
+          ebooks: ebooks || [],
+          materials: materials || [],
+          courses: courses
+        }}
       />
       <Pagination page={page} pageSize={PAGE_SIZE} total={count || 0} />
     </div>

@@ -4,13 +4,12 @@ import { createClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
-export async function createSale({ userId, ebookIds, totalAmount }) {
-  if (!userId || !ebookIds || ebookIds.length === 0) {
-    return { error: 'Cliente e e-books são obrigatórios.' }
+export async function createSale({ userId, items, totalAmount }) {
+  if (!userId || !items || items.length === 0) {
+    return { error: 'Cliente e itens são obrigatórios.' }
   }
 
   const { user } = await requireAdmin()
-
   const supabase = await createClient()
 
   // 1. Criar a venda na tabela sales
@@ -25,30 +24,29 @@ export async function createSale({ userId, ebookIds, totalAmount }) {
     return { error: 'Erro ao registrar a venda.' }
   }
 
-  // 2. Criar os itens da venda em sale_items
-  const saleItems = ebookIds.map(id => ({ sale_id: sale.id, ebook_id: id }))
+  // 2. Criar os itens da venda em sale_items (polimórfico)
+  const saleItems = items.map(item => ({ sale_id: sale.id, item_id: item.id, item_type: item.type }))
   const { error: itemsError } = await supabase
     .from('sale_items')
     .insert(saleItems)
 
   if (itemsError) {
     console.error('Erro ao registrar itens da venda:', itemsError)
-    // We don't rollback for now, just log it.
   }
 
-  // 3. Atribuir os livros ao usuário (para que ele possa acessar na biblioteca)
-  const assignments = ebookIds.map(id => ({
-    user_id: userId,
-    ebook_id: id,
-    assigned_by: user.id
-  }))
+  // 3. Atribuir os itens ao usuário
+  for (const item of items) {
+    let tableName = ''
+    let idCol = ''
+    if (item.type === 'ebook') { tableName = 'user_ebooks'; idCol = 'ebook_id' }
+    else if (item.type === 'material') { tableName = 'user_materials'; idCol = 'material_id' }
+    else if (item.type === 'course') { tableName = 'user_courses'; idCol = 'course_id' }
 
-  const { error: assignError } = await supabase
-    .from('user_ebooks')
-    .upsert(assignments, { onConflict: 'user_id,ebook_id' }) // Ignora se ele já tem o livro
-
-  if (assignError) {
-    console.error('Erro ao atribuir e-books:', assignError)
+    if (tableName) {
+      await supabase
+        .from(tableName)
+        .upsert([{ user_id: userId, [idCol]: item.id, assigned_by: user.id }], { onConflict: `user_id,${idCol}` })
+    }
   }
 
   revalidatePath('/admin/vendas')

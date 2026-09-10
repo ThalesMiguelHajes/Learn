@@ -4,7 +4,7 @@ import { useState } from 'react'
 import NovaVendaModal from '@/components/admin/NovaVendaModal'
 import { IconWallet, IconPlus } from '@/components/icons'
 
-export default function VendasClient({ sales, totalRevenue, users, ebooks }) {
+export default function VendasClient({ sales, totalRevenue, users, products }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
@@ -12,7 +12,7 @@ export default function VendasClient({ sales, totalRevenue, users, ebooks }) {
       <div className="page-header">
         <div className="page-header-left">
           <h1>Vendas Financeiras</h1>
-          <p>Gerencie o faturamento e atribua e-books aos clientes.</p>
+          <p>Gerencie o faturamento e atribua produtos aos clientes.</p>
         </div>
         <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
           <IconPlus size={16} /> Registrar Venda
@@ -38,7 +38,7 @@ export default function VendasClient({ sales, totalRevenue, users, ebooks }) {
             <thead>
               <tr>
                 <th>Cliente</th>
-                <th>E-books Vendidos</th>
+                <th>Produtos Vendidos</th>
                 <th>Valor Cobrado</th>
                 <th>Data</th>
               </tr>
@@ -51,7 +51,7 @@ export default function VendasClient({ sales, totalRevenue, users, ebooks }) {
                     <div className="text-tertiary" style={{ fontSize: '0.8125rem' }}>{sale.profiles?.email}</div>
                   </td>
                   <td>
-                    {sale.sale_items?.length || 0} e-book(s)
+                    {sale.sale_items?.length || 0} produto(s)
                   </td>
                   <td className="revenue-cell">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sale.total_amount)}
@@ -69,7 +69,7 @@ export default function VendasClient({ sales, totalRevenue, users, ebooks }) {
       {isModalOpen && (
         <NovaVendaModal
           users={users}
-          ebooks={ebooks}
+          products={products}
           onClose={() => setIsModalOpen(false)}
         />
       )}
