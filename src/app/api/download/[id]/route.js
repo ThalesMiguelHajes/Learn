@@ -31,7 +31,9 @@ export async function GET(request, { params }) {
     bucket = 'materials'
   }
 
-  // 2. Verify ownership — check if user has this assigned
+  let hasAccess = false
+
+  // 2. Verify ownership — check if user has this assigned directly
   const { data: ownership, error: ownershipError } = await supabase
     .from(ownershipTable)
     .select('id')
@@ -39,7 +41,25 @@ export async function GET(request, { params }) {
     .eq(idCol, id)
     .single()
 
-  if (ownershipError || !ownership) {
+  if (ownership) {
+    hasAccess = true
+  }
+
+  // 3. If not direct ownership, check if they own a course that contains the material
+  if (!hasAccess && itemType === 'material') {
+    const { data: courseAccess } = await supabase
+      .from('course_materials')
+      .select('course_id, user_courses!inner(user_id)')
+      .eq('material_id', id)
+      .eq('user_courses.user_id', user.id)
+      .limit(1)
+
+    if (courseAccess && courseAccess.length > 0) {
+      hasAccess = true
+    }
+  }
+
+  if (!hasAccess) {
     return Response.json(
       { error: `Acesso negado. Você não possui este ${itemType}.` },
       { status: 403 }

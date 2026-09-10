@@ -31,6 +31,17 @@ export default async function BibliotecaPage({ searchParams }) {
     .filter((m) => m && m.is_active)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) || []
 
+  // Fetch courses
+  const { data: userCourses } = await supabase
+    .from('user_courses')
+    .select('courses(*)')
+    .eq('user_id', user.id)
+
+  const courses = userCourses
+    ?.map((uc) => uc.courses)
+    .filter((c) => c && c.is_active)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) || []
+
   // Fetch playlists
   const { data: playlists } = await supabase
     .from('playlists')
@@ -48,7 +59,7 @@ export default async function BibliotecaPage({ searchParams }) {
       <div className="page-header mb-xl">
         <div className="page-header-left">
           <h1 className="flex items-center gap-sm"><IconBooks size={26} /> Minha Biblioteca</h1>
-          <p>Gerencie seus e-books e coleções personalizadas.</p>
+          <p>Gerencie seus produtos, cursos e coleções.</p>
         </div>
       </div>
 
@@ -64,6 +75,12 @@ export default async function BibliotecaPage({ searchParams }) {
           className={`btn ${tab === 'materiais' ? 'btn-primary' : 'btn-secondary'}`}
         >
           Meus Materiais
+        </Link>
+        <Link
+          href="/biblioteca?tab=cursos"
+          className={`btn ${tab === 'cursos' ? 'btn-primary' : 'btn-secondary'}`}
+        >
+          Meus Cursos
         </Link>
         <Link
           href="/biblioteca?tab=playlists"
@@ -104,6 +121,24 @@ export default async function BibliotecaPage({ searchParams }) {
           <div className="ebook-grid">
             {materials.map((material, index) => (
               <EbookCard key={material.id} ebook={material} isMaterial={true} index={index} />
+            ))}
+          </div>
+        )
+      )}
+
+      {tab === 'cursos' && (
+        !courses || courses.length === 0 ? (
+          <div className="glass-card">
+            <div className="empty-state">
+              <div className="empty-icon"><IconBookOpen size={40} /></div>
+              <h3>Nenhum curso encontrado</h3>
+              <p>Quando você comprar ou receber cursos em vídeo, eles aparecerão aqui.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="ebook-grid">
+            {courses.map((course, index) => (
+              <EbookCard key={course.id} ebook={course} isCourse={true} index={index} />
             ))}
           </div>
         )

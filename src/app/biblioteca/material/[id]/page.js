@@ -25,7 +25,7 @@ export default async function DetalhesLivroPage({ params }) {
   const { user } = await requireAuth()
   const supabase = await createClient()
 
-  // Verificar se o usuário possui este e-book
+  // Verificar se o usuário possui este material diretamente
   const { data: ownership } = await supabase
     .from('user_materials')
     .select('id')
@@ -33,12 +33,28 @@ export default async function DetalhesLivroPage({ params }) {
     .eq('material_id', id)
     .single()
 
-  if (!ownership) {
+  let hasAccess = !!ownership
+
+  // Se não possuir diretamente, verificar se possui através de um curso
+  if (!hasAccess) {
+    const { data: courseAccess } = await supabase
+      .from('course_materials')
+      .select('course_id, user_courses!inner(user_id)')
+      .eq('material_id', id)
+      .eq('user_courses.user_id', user.id)
+      .limit(1)
+
+    if (courseAccess && courseAccess.length > 0) {
+      hasAccess = true
+    }
+  }
+
+  if (!hasAccess) {
     return (
       <div className="center-message-page">
         <div className="glass-card center-message-card">
           <h2>Acesso Negado</h2>
-          <p>Você não possui acesso a este e-book.</p>
+          <p>Você não possui acesso a este material.</p>
           <Link href="/biblioteca" className="btn btn-primary mt-md">
             Voltar para a Biblioteca
           </Link>

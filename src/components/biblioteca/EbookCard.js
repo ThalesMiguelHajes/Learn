@@ -1,12 +1,23 @@
 'use client'
 
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import { IconBookOpen } from '@/components/icons'
 
-export default function EbookCard({ ebook, index, isMaterial = false }) {
-  const href = isMaterial ? `/biblioteca/material/${ebook.id}` : `/biblioteca/livro/${ebook.id}`
-  const format = ebook.file_type || ebook.material_type
+export default function EbookCard({ ebook, index = 0, isMaterial = false, isCourse = false }) {
+  // If it doesn't have an id, we can't link to it.
+  if (!ebook?.id) return null
+
+  let href = `/biblioteca/livro/${ebook.id}`
+  let typeLabel = ebook.file_type || 'E-book'
+  
+  if (isMaterial) {
+    href = `/biblioteca/material/${ebook.id}`
+    typeLabel = ebook.material_type || 'Material'
+  } else if (isCourse) {
+    href = `/biblioteca/cursos/${ebook.id}`
+    typeLabel = 'Curso'
+  }
 
   return (
     <Link
@@ -34,8 +45,8 @@ export default function EbookCard({ ebook, index, isMaterial = false }) {
           <p className="ebook-card-desc">{ebook.description}</p>
         )}
         <div className="ebook-card-footer">
-          {format && (
-            <span className="badge badge-info">{format.toUpperCase()}</span>
+          {typeLabel && (
+            <span className="badge badge-info">{typeLabel.toUpperCase()}</span>
           )}
           <span className="text-secondary" style={{ fontSize: '0.8rem', marginLeft: 'auto' }}>
             Detalhes &rarr;
