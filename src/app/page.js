@@ -111,7 +111,7 @@ export default async function LandingPage() {
                   {courses.map((course, index) => (
                     <Link
                       key={course.id}
-                      href="/cadastro"
+                      href={`/biblioteca/checkout/${course.id}?type=course`}
                       className="glass-card ebook-card animate-in"
                       style={{ animationDelay: `${index * 80}ms` }}
                     >
@@ -161,7 +161,7 @@ export default async function LandingPage() {
                   {ebooks.map((ebook, index) => (
                     <Link
                       key={ebook.id}
-                      href="/cadastro"
+                      href={`/biblioteca/checkout/${ebook.id}?type=ebook`}
                       className="glass-card ebook-card animate-in"
                       style={{ animationDelay: `${index * 80}ms` }}
                     >
@@ -211,7 +211,7 @@ export default async function LandingPage() {
                   {materials.map((material, index) => (
                     <Link
                       key={material.id}
-                      href="/cadastro"
+                      href={`/biblioteca/checkout/${material.id}?type=material`}
                       className="glass-card ebook-card animate-in"
                       style={{ animationDelay: `${index * 80}ms` }}
                     >

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { IconBooks, IconBookOpen, IconFolder } from '@/components/icons'
 
 export default async function BibliotecaPage({ searchParams }) {
-  const { tab = 'livros' } = await searchParams || {}
+  const tab = searchParams?.tab || 'livros'
   const { user } = await requireAuth()
   const supabase = await createClient()
 

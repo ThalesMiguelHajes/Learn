@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
-export default function CheckoutClient({ ebook, userProfile }) {
+export default function CheckoutClient({ ebook, userProfile, itemType }) {
   const [cpf, setCpf] = useState(userProfile?.cpf || '')
   const [phone, setPhone] = useState(userProfile?.phone || '')
   const [loading, setLoading] = useState(false)
@@ -42,7 +42,8 @@ export default function CheckoutClient({ ebook, userProfile }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ebookId: ebook.id,
+          itemId: ebook.id,
+          itemType: itemType || 'ebook',
           cpf: cleanCpf,
           phone: cleanPhone
         }),
@@ -52,7 +53,7 @@ export default function CheckoutClient({ ebook, userProfile }) {
 
       if (!response.ok) {
         if (response.status === 409) {
-          setError('Você já possui este e-book. Acesse sua biblioteca!')
+          setError('Você já possui este produto. Acesse sua biblioteca!')
           return
         }
         if (response.status === 401) {
@@ -109,7 +110,7 @@ export default function CheckoutClient({ ebook, userProfile }) {
               {ebook.title}
             </h3>
             <p className="text-secondary" style={{ fontSize: '0.9rem' }}>
-              E-book Digital
+              {itemType === 'material' ? 'Material Digital' : itemType === 'course' ? 'Curso em Vídeo' : 'E-book Digital'}
             </p>
           </div>
         </div>

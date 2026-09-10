@@ -7,38 +7,53 @@ export const metadata = {
   title: 'Finalizar Compra — KodaBooks',
 }
 
-export default async function CheckoutPage({ params }) {
-  // `params` is a Promise in Next.js 15+, need to await it
-  const { id: ebookId } = await params
+export default async function CheckoutPage({ params, searchParams }) {
+  const itemId = params?.id
+  const type = searchParams?.type
+  const itemType = type || 'ebook'
 
-  if (!ebookId) {
+  if (!itemId) {
     redirect('/biblioteca')
   }
 
   const { user } = await requireAuth()
   const supabase = await createClient()
 
-  // 2. Buscar o e-book
-  const { data: ebook } = await supabase
-    .from('ebooks')
+  let tableName = 'ebooks'
+  let ownershipTable = 'user_ebooks'
+  let ownershipIdCol = 'ebook_id'
+
+  if (itemType === 'material') {
+    tableName = 'materials'
+    ownershipTable = 'user_materials'
+    ownershipIdCol = 'material_id'
+  } else if (itemType === 'course') {
+    tableName = 'courses'
+    ownershipTable = 'user_courses'
+    ownershipIdCol = 'course_id'
+  }
+
+  // 2. Buscar o item
+  const { data: item } = await supabase
+    .from(tableName)
     .select('id, title, cover_url, price, is_active')
-    .eq('id', ebookId)
+    .eq('id', itemId)
     .single()
 
-  if (!ebook || !ebook.is_active) {
+  if (!item || !item.is_active) {
     redirect('/biblioteca')
   }
 
-  // 3. Verificar se o usuário já tem o e-book
-  const { data: hasEbook } = await supabase
-    .from('user_ebooks')
+  // 3. Verificar se o usuário já tem o item
+  const { data: hasItem } = await supabase
+    .from(ownershipTable)
     .select('id')
     .eq('user_id', user.id)
-    .eq('ebook_id', ebookId)
+    .eq(ownershipIdCol, itemId)
     .single()
 
-  if (hasEbook) {
-    redirect(`/biblioteca/sucesso?ebook=${ebookId}`)
+  if (hasItem) {
+    redirect(`/biblioteca/sucesso?item=${itemId}&type=${itemType}`)
   }
 
   // 4. Buscar o perfil do usuário para pré-preencher CPF e Telefone (caso existam)
@@ -54,7 +69,7 @@ export default async function CheckoutPage({ params }) {
         Finalizar Compra
       </h1>
 
-      <CheckoutClient ebook={ebook} userProfile={profile} />
+      <CheckoutClient ebook={item} userProfile={profile} itemType={itemType} />
     </div>
   )
 }

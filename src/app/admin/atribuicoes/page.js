@@ -9,7 +9,7 @@ const PAGE_SIZE = 25
 
 export default async function AtribuicoesPage({ searchParams }) {
   await requireAdmin()
-  const { page: pageParam, tab = 'ebooks' } = await searchParams || {}
+  const pageParam = searchParams?.page; const tab = searchParams?.tab || 'ebooks';
   const page = Math.max(1, parseInt(pageParam, 10) || 1)
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1

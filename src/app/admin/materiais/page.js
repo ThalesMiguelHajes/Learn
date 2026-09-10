@@ -11,7 +11,7 @@ const PAGE_SIZE = 20
 
 export default async function MaterialsListPage({ searchParams }) {
   await requireAdmin()
-  const { q, page: pageParam } = await searchParams || {}
+  const q = searchParams?.q; const pageParam = searchParams?.page;
   const page = Math.max(1, parseInt(pageParam, 10) || 1)
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
