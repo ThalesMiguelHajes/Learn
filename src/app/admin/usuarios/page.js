@@ -11,7 +11,8 @@ const PAGE_SIZE = 20
 
 export default async function UsuariosPage({ searchParams }) {
   await requireAdmin()
-  const q = searchParams?.q; const pageParam = searchParams?.page;
+  const resolvedSearchParams = await searchParams
+  const q = resolvedSearchParams?.q; const pageParam = resolvedSearchParams?.page;
   const page = Math.max(1, parseInt(pageParam, 10) || 1)
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1

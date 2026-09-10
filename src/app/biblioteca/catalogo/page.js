@@ -11,7 +11,8 @@ export const metadata = {
 }
 
 export default async function CatalogoPage({ searchParams }) {
-  const q = searchParams?.q
+  const resolvedSearchParams = await searchParams
+  const q = resolvedSearchParams?.q
   const supabase = await createClient()
 
   const { user } = await getUser()

@@ -8,9 +8,10 @@ export const metadata = {
 }
 
 export default async function CheckoutPage({ params, searchParams }) {
-  const itemId = params?.id
-  const type = searchParams?.type
-  const itemType = type || 'ebook'
+  const { id: itemId } = await params
+  const resolvedSearchParams = await searchParams
+  const type = resolvedSearchParams?.type
+  let itemType = type || 'ebook'
 
   if (!itemId) {
     redirect('/biblioteca')
@@ -19,26 +20,40 @@ export default async function CheckoutPage({ params, searchParams }) {
   const { user } = await requireAuth()
   const supabase = await createClient()
 
-  let tableName = 'ebooks'
-  let ownershipTable = 'user_ebooks'
-  let ownershipIdCol = 'ebook_id'
-
-  if (itemType === 'material') {
-    tableName = 'materials'
-    ownershipTable = 'user_materials'
-    ownershipIdCol = 'material_id'
-  } else if (itemType === 'course') {
-    tableName = 'courses'
-    ownershipTable = 'user_courses'
-    ownershipIdCol = 'course_id'
+  const typeConfig = {
+    ebook: { table: 'ebooks', ownershipTable: 'user_ebooks', ownershipIdCol: 'ebook_id' },
+    material: { table: 'materials', ownershipTable: 'user_materials', ownershipIdCol: 'material_id' },
+    course: { table: 'courses', ownershipTable: 'user_courses', ownershipIdCol: 'course_id' },
   }
 
-  // 2. Buscar o item
-  const { data: item } = await supabase
-    .from(tableName)
+  let selectedConfig = typeConfig[itemType] || typeConfig.ebook
+
+  // 2. Buscar o item na tabela correspondente
+  let { data: item } = await supabase
+    .from(selectedConfig.table)
     .select('id, title, cover_url, price, is_active')
     .eq('id', itemId)
     .single()
+
+  // Se não encontrar pelo tipo informado (ou se não foi passado ?type=), procura nos outros tipos
+  if (!item) {
+    const otherTypes = ['ebook', 'material', 'course'].filter((t) => t !== itemType)
+    for (const altType of otherTypes) {
+      const altConfig = typeConfig[altType]
+      const { data: altItem } = await supabase
+        .from(altConfig.table)
+        .select('id, title, cover_url, price, is_active')
+        .eq('id', itemId)
+        .single()
+
+      if (altItem) {
+        item = altItem
+        itemType = altType
+        selectedConfig = altConfig
+        break
+      }
+    }
+  }
 
   if (!item || !item.is_active) {
     redirect('/biblioteca')
@@ -46,10 +61,10 @@ export default async function CheckoutPage({ params, searchParams }) {
 
   // 3. Verificar se o usuário já tem o item
   const { data: hasItem } = await supabase
-    .from(ownershipTable)
+    .from(selectedConfig.ownershipTable)
     .select('id')
     .eq('user_id', user.id)
-    .eq(ownershipIdCol, itemId)
+    .eq(selectedConfig.ownershipIdCol, itemId)
     .single()
 
   if (hasItem) {

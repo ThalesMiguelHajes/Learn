@@ -11,11 +11,12 @@ export const metadata = {
 }
 
 export default async function SucessoPage({ searchParams }) {
-  const itemId = searchParams?.item
-  const oldEbookId = searchParams?.ebook
-  const type = searchParams?.type
+  const resolvedSearchParams = await searchParams
+  const itemId = resolvedSearchParams?.item
+  const oldEbookId = resolvedSearchParams?.ebook
+  const type = resolvedSearchParams?.type
   const idToUse = itemId || oldEbookId
-  const itemType = type || 'ebook'
+  let itemType = type || 'ebook'
 
   if (!idToUse) {
     redirect('/biblioteca')
@@ -24,32 +25,60 @@ export default async function SucessoPage({ searchParams }) {
   const { user } = await requireAuth()
   const supabase = await createClient()
 
-  let tableName = 'ebooks'
-  let ownershipTable = 'user_ebooks'
-  let ownershipIdCol = 'ebook_id'
-  let linkTo = `/biblioteca/livro/${idToUse}`
-  let label = 'e-book'
-
-  if (itemType === 'material') {
-    tableName = 'materials'
-    ownershipTable = 'user_materials'
-    ownershipIdCol = 'material_id'
-    linkTo = `/biblioteca/material/${idToUse}`
-    label = 'material'
-  } else if (itemType === 'course') {
-    tableName = 'courses'
-    ownershipTable = 'user_courses'
-    ownershipIdCol = 'course_id'
-    linkTo = `/biblioteca/cursos/${idToUse}`
-    label = 'curso'
+  const typeConfig = {
+    ebook: {
+      table: 'ebooks',
+      ownershipTable: 'user_ebooks',
+      ownershipIdCol: 'ebook_id',
+      linkTo: `/biblioteca/livro/${idToUse}`,
+      label: 'e-book',
+    },
+    material: {
+      table: 'materials',
+      ownershipTable: 'user_materials',
+      ownershipIdCol: 'material_id',
+      linkTo: `/biblioteca/material/${idToUse}`,
+      label: 'material',
+    },
+    course: {
+      table: 'courses',
+      ownershipTable: 'user_courses',
+      ownershipIdCol: 'course_id',
+      linkTo: `/biblioteca/cursos/${idToUse}`,
+      label: 'curso',
+    },
   }
 
+  let selectedConfig = typeConfig[itemType] || typeConfig.ebook
+
   // 2. Buscar dados do item
-  const { data: itemData } = await supabase
-    .from(tableName)
+  let { data: itemData } = await supabase
+    .from(selectedConfig.table)
     .select('id, title, cover_url')
     .eq('id', idToUse)
     .single()
+
+  // Se não encontrar pelo tipo informado, procura nos outros tipos
+  if (!itemData) {
+    const otherTypes = ['ebook', 'material', 'course'].filter((t) => t !== itemType)
+    for (const altType of otherTypes) {
+      const altConfig = typeConfig[altType]
+      const { data: altItem } = await supabase
+        .from(altConfig.table)
+        .select('id, title, cover_url')
+        .eq('id', idToUse)
+        .single()
+
+      if (altItem) {
+        itemData = altItem
+        itemType = altType
+        selectedConfig = altConfig
+        break
+      }
+    }
+  }
+
+  const { ownershipTable, ownershipIdCol, linkTo, label } = selectedConfig
 
   // 3. Verificar se o item JÁ está liberado (webhook chegou rápido ou já tinha)
   const { data: hasItem } = await supabase

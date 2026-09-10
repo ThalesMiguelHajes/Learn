@@ -11,7 +11,8 @@ export const metadata = {
 
 export default async function VendasPage({ searchParams }) {
   await requireAdmin()
-  const pageParam = searchParams?.page;
+  const resolvedSearchParams = await searchParams
+  const pageParam = resolvedSearchParams?.page;
   const page = Math.max(1, parseInt(pageParam, 10) || 1)
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
