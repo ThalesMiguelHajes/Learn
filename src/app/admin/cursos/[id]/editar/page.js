@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { BUCKETS, ACCEPTED_COVER_TYPES } from '@/lib/constants'
-import { IconArrowLeft, IconSave, IconPlus, IconTrash, IconEdit, IconImage, IconLink } from '@/components/icons'
+import { IconArrowLeft, IconCheck, IconPlus, IconTrash, IconEdit, IconImage, IconLink } from '@/components/icons'
 import Modal from '@/components/ui/Modal'
 
 export default function EditarCursoPage({ params }) {
@@ -288,7 +288,7 @@ export default function EditarCursoPage({ params }) {
             </div>
 
             <button type="submit" className="btn btn-primary w-full" disabled={saving}>
-              {saving ? <span className="spinner" /> : <><IconSave size={16} /> Salvar Alterações</>}
+              {saving ? <span className="spinner" /> : <><IconCheck size={16} /> Salvar Alterações</>}
             </button>
           </form>
 
