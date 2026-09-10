@@ -146,3 +146,15 @@ export function IconDevices(props) {
 export function IconPlay(props) {
   return <Icon {...props}><polygon points="5 3 19 12 5 21 5 3" /></Icon>
 }
+
+export function IconChevronDown(props) {
+  return <Icon {...props}><polyline points="6 9 12 15 18 9" /></Icon>
+}
+
+export function IconChevronUp(props) {
+  return <Icon {...props}><polyline points="18 15 12 9 6 15" /></Icon>
+}
+
+export function IconCircle(props) {
+  return <Icon {...props}><circle cx="12" cy="12" r="9" /></Icon>
+}
