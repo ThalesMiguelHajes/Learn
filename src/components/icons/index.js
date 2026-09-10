@@ -142,3 +142,7 @@ export function IconEyeOff(props) {
 export function IconDevices(props) {
   return <Icon {...props}><rect x="2" y="4" width="14" height="10" rx="1" /><line x1="6" y1="18" x2="12" y2="18" /><rect x="17" y="9" width="5" height="9" rx="1" /></Icon>
 }
+
+export function IconPlay(props) {
+  return <Icon {...props}><polygon points="5 3 19 12 5 21 5 3" /></Icon>
+}
