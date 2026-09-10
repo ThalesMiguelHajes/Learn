@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { IconCheckCircle, IconBookOpen, IconCart, IconDevices } from '@/components/icons'
 
-export default function CatalogCard({ ebook, index, hasEbook = false }) {
+export default function CatalogCard({ ebook, index, hasEbook = false, itemType = 'ebook' }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const router = useRouter()
@@ -17,14 +17,24 @@ export default function CatalogCard({ ebook, index, hasEbook = false }) {
 
   async function handleBuy() {
     if (hasEbook) {
-      router.push(`/biblioteca/livro/${ebook.id}`)
+      if (itemType === 'material') {
+        router.push(`/biblioteca/material/${ebook.id}`)
+      } else if (itemType === 'course') {
+        router.push(`/biblioteca/cursos/${ebook.id}`)
+      } else {
+        router.push(`/biblioteca/livro/${ebook.id}`)
+      }
       return
     }
 
     setLoading(true)
-    // Redireciona para a página de checkout para coletar CPF e Telefone
-    router.push(`/biblioteca/checkout/${ebook.id}`)
+    // Redireciona para a página de checkout para coletar CPF e Telefone (o checkout foi refatorado para ler type na query string)
+    router.push(`/biblioteca/checkout/${ebook.id}?type=${itemType}`)
   }
+
+  let typeBadge = 'E-book'
+  if (itemType === 'material') typeBadge = ebook.material_type ? ebook.material_type.toUpperCase() : 'Material'
+  if (itemType === 'course') typeBadge = 'Curso'
 
   return (
     <div
@@ -61,7 +71,8 @@ export default function CatalogCard({ ebook, index, hasEbook = false }) {
         )}
 
         <div className="ebook-card-footer">
-          <span className="ebook-card-price">{hasEbook ? 'Adquirido' : priceFormatted}</span>
+          <span className="badge badge-accent" style={{ fontSize: '0.65rem' }}>{typeBadge}</span>
+          <span className="ebook-card-price" style={{ marginLeft: 'auto', marginRight: '0.5rem' }}>{hasEbook ? 'Adquirido' : priceFormatted}</span>
           <button
             id={`buy-ebook-${ebook.id}`}
             onClick={handleBuy}
@@ -71,7 +82,7 @@ export default function CatalogCard({ ebook, index, hasEbook = false }) {
             {loading ? (
               <><span className="spinner" /> Aguarde...</>
             ) : hasEbook ? (
-              <><IconBookOpen size={14} /> Ler</>
+              <><IconBookOpen size={14} /> Acessar</>
             ) : (
               <><IconCart size={14} /> Comprar</>
             )}

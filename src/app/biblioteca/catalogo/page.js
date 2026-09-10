@@ -16,37 +16,51 @@ export default async function CatalogoPage({ searchParams }) {
 
   const { user } = await getUser()
 
-  let query = supabase
-    .from('ebooks')
-    .select('*')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
+  let queryEbooks = supabase.from('ebooks').select('*').eq('is_active', true)
+  let queryMaterials = supabase.from('materials').select('*').eq('is_active', true)
+  let queryCourses = supabase.from('courses').select('*').eq('is_active', true)
 
   if (q) {
-    query = query.ilike('title', `%${q}%`)
+    queryEbooks = queryEbooks.ilike('title', `%${q}%`)
+    queryMaterials = queryMaterials.ilike('title', `%${q}%`)
+    queryCourses = queryCourses.ilike('title', `%${q}%`)
   }
 
-  const { data: ebooks, error } = await query
+  const [
+    { data: ebooksData },
+    { data: materialsData },
+    { data: coursesData }
+  ] = await Promise.all([queryEbooks, queryMaterials, queryCourses])
 
-  // Buscar os e-books que o usuário já possui
+  let allProducts = []
+  if (ebooksData) allProducts.push(...ebooksData.map(e => ({ ...e, itemType: 'ebook' })))
+  if (materialsData) allProducts.push(...materialsData.map(m => ({ ...m, itemType: 'material' })))
+  if (coursesData) allProducts.push(...coursesData.map(c => ({ ...c, itemType: 'course' })))
+
+  allProducts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+
+  // Buscar os produtos que o usuário já possui
   let ownedEbookIds = []
+  let ownedMaterialIds = []
+  let ownedCourseIds = []
+
   if (user) {
-    const { data: userEbooks } = await supabase
-      .from('user_ebooks')
-      .select('ebook_id')
-      .eq('user_id', user.id)
-    
-    if (userEbooks) {
-      ownedEbookIds = userEbooks.map(ue => ue.ebook_id)
-    }
+    const { data: userEbooks } = await supabase.from('user_ebooks').select('ebook_id').eq('user_id', user.id)
+    if (userEbooks) ownedEbookIds = userEbooks.map(ue => ue.ebook_id)
+
+    const { data: userMaterials } = await supabase.from('user_materials').select('material_id').eq('user_id', user.id)
+    if (userMaterials) ownedMaterialIds = userMaterials.map(um => um.material_id)
+
+    const { data: userCourses } = await supabase.from('user_courses').select('course_id').eq('user_id', user.id)
+    if (userCourses) ownedCourseIds = userCourses.map(uc => uc.course_id)
   }
 
   return (
     <div className="biblioteca-page">
       <div className="page-header">
         <div>
-          <h2>Catálogo de E-books</h2>
-          <p className="text-secondary">O que você vai aprender hoje? Escolha seu próximo e-book.</p>
+          <h2>Catálogo</h2>
+          <p className="text-secondary">O que você vai aprender hoje? Escolha seu próximo material.</p>
         </div>
       </div>
       
@@ -54,24 +68,22 @@ export default async function CatalogoPage({ searchParams }) {
         <SearchBar placeholder="Buscar no catálogo..." />
       </Suspense>
 
-      {error && (
-        <div className="form-feedback form-feedback-error mb-lg">
-          Erro ao carregar o catálogo.
-        </div>
-      )}
-
-      {!ebooks || ebooks.length === 0 ? (
+      {allProducts.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon"><IconSearch size={40} /></div>
-          <h3>{q ? 'Nenhum resultado' : 'Nenhum e-book disponível'}</h3>
-          <p>{q ? `Não encontramos nenhum e-book correspondente a "${q}". Tente outros termos!` : 'Ainda não há e-books publicados no catálogo.'}</p>
+          <h3>{q ? 'Nenhum resultado' : 'Nenhum produto disponível'}</h3>
+          <p>{q ? `Não encontramos nada correspondente a "${q}". Tente outros termos!` : 'Ainda não há produtos publicados no catálogo.'}</p>
         </div>
       ) : (
         <div className="ebook-grid">
-          {ebooks.map((ebook, idx) => {
-            const hasEbook = ownedEbookIds.includes(ebook.id)
+          {allProducts.map((product, idx) => {
+            let hasItem = false
+            if (product.itemType === 'ebook') hasItem = ownedEbookIds.includes(product.id)
+            if (product.itemType === 'material') hasItem = ownedMaterialIds.includes(product.id)
+            if (product.itemType === 'course') hasItem = ownedCourseIds.includes(product.id)
+
             return (
-              <CatalogCard key={ebook.id} ebook={ebook} index={idx} hasEbook={hasEbook} />
+              <CatalogCard key={`${product.itemType}-${product.id}`} ebook={product} index={idx} hasEbook={hasItem} itemType={product.itemType} />
             )
           })}
         </div>

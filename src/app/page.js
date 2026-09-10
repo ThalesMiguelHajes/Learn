@@ -40,6 +40,13 @@ export default async function LandingPage() {
     .eq('is_active', true)
     .limit(4)
 
+  // Buscar até 4 cursos ativos para a vitrine
+  const { data: courses } = await supabase
+    .from('courses')
+    .select('*')
+    .eq('is_active', true)
+    .limit(4)
+
   return (
     <div className="page-shell">
       <header className="landing-header">
@@ -91,9 +98,59 @@ export default async function LandingPage() {
           </section>
         </Reveal>
 
-        {ebooks && ebooks.length > 0 && (
+        {courses && courses.length > 0 && (
           <Reveal>
             <section className="landing-showcase">
+              <div className="landing-showcase-inner">
+                <div className="text-center mb-xl">
+                  <h2>Cursos em Vídeo</h2>
+                  <p className="text-secondary">Aprenda com aulas práticas e direto ao ponto.</p>
+                </div>
+
+                <div className="ebook-grid">
+                  {courses.map((course, index) => (
+                    <Link
+                      key={course.id}
+                      href="/cadastro"
+                      className="glass-card ebook-card animate-in"
+                      style={{ animationDelay: `${index * 80}ms` }}
+                    >
+                      {course.cover_url ? (
+                        <div className="ebook-card-cover">
+                          <Image
+                            src={course.cover_url}
+                            alt={`Capa de ${course.title}`}
+                            fill
+                            sizes="(max-width: 768px) 45vw, 280px"
+                          />
+                        </div>
+                      ) : (
+                        <div className="ebook-card-cover ebook-card-cover-placeholder">
+                          <IconDevices size={40} />
+                        </div>
+                      )}
+                      <div className="ebook-card-body">
+                        <h3 className="ebook-card-title">{course.title}</h3>
+                        <div className="ebook-card-footer mt-md">
+                          <span className="ebook-card-price">
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(course.price || 0)}
+                          </span>
+                          <span className="text-secondary" style={{ fontSize: '0.8rem' }}>
+                            Comprar &rarr;
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </Reveal>
+        )}
+
+        {ebooks && ebooks.length > 0 && (
+          <Reveal>
+            <section className="landing-showcase" style={{ paddingTop: '2rem' }}>
               <div className="landing-showcase-inner">
                 <div className="text-center mb-xl">
                   <h2>Destaques de E-books</h2>
