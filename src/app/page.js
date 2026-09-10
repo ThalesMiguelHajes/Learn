@@ -33,6 +33,13 @@ export default async function LandingPage() {
     .eq('is_active', true)
     .limit(4)
 
+  // Buscar até 4 materiais ativos para a vitrine
+  const { data: materials } = await supabase
+    .from('materials')
+    .select('*')
+    .eq('is_active', true)
+    .limit(4)
+
   return (
     <div className="page-shell">
       <header className="landing-header">
@@ -89,8 +96,8 @@ export default async function LandingPage() {
             <section className="landing-showcase">
               <div className="landing-showcase-inner">
                 <div className="text-center mb-xl">
-                  <h2>Destaques do Catálogo</h2>
-                  <p className="text-secondary">Os conteúdos mais procurados do momento.</p>
+                  <h2>Destaques de E-books</h2>
+                  <p className="text-secondary">Os e-books mais procurados do momento.</p>
                 </div>
 
                 <div className="ebook-grid">
@@ -123,6 +130,54 @@ export default async function LandingPage() {
                           </span>
                           <span className="text-secondary" style={{ fontSize: '0.8rem' }}>
                             Comprar &rarr;
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </Reveal>
+        )}
+
+        {materials && materials.length > 0 && (
+          <Reveal>
+            <section className="landing-showcase" style={{ paddingTop: '2rem' }}>
+              <div className="landing-showcase-inner">
+                <div className="text-center mb-xl">
+                  <h2>Materiais Práticos</h2>
+                  <p className="text-secondary">Códigos-fonte, assets e slides para ir direto ao ponto.</p>
+                </div>
+
+                <div className="ebook-grid">
+                  {materials.map((material, index) => (
+                    <Link
+                      key={material.id}
+                      href="/cadastro"
+                      className="glass-card ebook-card animate-in"
+                      style={{ animationDelay: `${index * 80}ms` }}
+                    >
+                      {material.cover_url ? (
+                        <div className="ebook-card-cover">
+                          <Image
+                            src={material.cover_url}
+                            alt={`Capa de ${material.title}`}
+                            fill
+                            sizes="(max-width: 768px) 45vw, 280px"
+                          />
+                        </div>
+                      ) : (
+                        <div className="ebook-card-cover ebook-card-cover-placeholder">
+                          <IconDevices size={40} />
+                        </div>
+                      )}
+                      <div className="ebook-card-body">
+                        <h3 className="ebook-card-title">{material.title}</h3>
+                        <div className="ebook-card-footer mt-md">
+                          <span className="badge badge-info">{material.material_type?.toUpperCase()}</span>
+                          <span className="ebook-card-price">
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(material.price || 0)}
                           </span>
                         </div>
                       </div>

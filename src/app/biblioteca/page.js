@@ -20,6 +20,17 @@ export default async function BibliotecaPage({ searchParams }) {
     .filter((e) => e && e.is_active)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) || []
 
+  // Fetch materials
+  const { data: userMaterials } = await supabase
+    .from('user_materials')
+    .select('materials(*)')
+    .eq('user_id', user.id)
+
+  const materials = userMaterials
+    ?.map((um) => um.materials)
+    .filter((m) => m && m.is_active)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) || []
+
   // Fetch playlists
   const { data: playlists } = await supabase
     .from('playlists')
@@ -49,6 +60,12 @@ export default async function BibliotecaPage({ searchParams }) {
           Meus E-books
         </Link>
         <Link
+          href="/biblioteca?tab=materiais"
+          className={`btn ${tab === 'materiais' ? 'btn-primary' : 'btn-secondary'}`}
+        >
+          Meus Materiais
+        </Link>
+        <Link
           href="/biblioteca?tab=playlists"
           className={`btn ${tab === 'playlists' ? 'btn-primary' : 'btn-secondary'}`}
         >
@@ -56,7 +73,7 @@ export default async function BibliotecaPage({ searchParams }) {
         </Link>
       </div>
 
-      {tab === 'livros' ? (
+      {tab === 'livros' && (
         !ebooks || ebooks.length === 0 ? (
           <div className="glass-card">
             <div className="empty-state">
@@ -72,7 +89,27 @@ export default async function BibliotecaPage({ searchParams }) {
             ))}
           </div>
         )
-      ) : (
+      )}
+
+      {tab === 'materiais' && (
+        !materials || materials.length === 0 ? (
+          <div className="glass-card">
+            <div className="empty-state">
+              <div className="empty-icon"><IconBookOpen size={40} /></div>
+              <h3>Nenhum material encontrado</h3>
+              <p>Quando você comprar ou receber materiais, eles aparecerão aqui.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="ebook-grid">
+            {materials.map((material, index) => (
+              <EbookCard key={material.id} ebook={material} isMaterial={true} index={index} />
+            ))}
+          </div>
+        )
+      )}
+
+      {tab === 'playlists' && (
         /* Aba de Playlists */
         !playlists || playlists.length === 0 ? (
           <div className="glass-card">

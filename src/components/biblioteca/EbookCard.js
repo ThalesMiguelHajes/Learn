@@ -4,10 +4,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { IconBookOpen } from '@/components/icons'
 
-export default function EbookCard({ ebook, index }) {
+export default function EbookCard({ ebook, index, isMaterial = false }) {
+  const href = isMaterial ? `/biblioteca/material/${ebook.id}` : `/biblioteca/livro/${ebook.id}`
+  const format = ebook.file_type || ebook.material_type
+
   return (
     <Link
-      href={`/biblioteca/livro/${ebook.id}`}
+      href={href}
       className="glass-card ebook-card animate-in"
       style={{ animationDelay: `${index * 80}ms` }}
     >
@@ -31,8 +34,8 @@ export default function EbookCard({ ebook, index }) {
           <p className="ebook-card-desc">{ebook.description}</p>
         )}
         <div className="ebook-card-footer">
-          {ebook.file_type && (
-            <span className="badge badge-info">{ebook.file_type.toUpperCase()}</span>
+          {format && (
+            <span className="badge badge-info">{format.toUpperCase()}</span>
           )}
           <span className="text-secondary" style={{ fontSize: '0.8rem', marginLeft: 'auto' }}>
             Detalhes &rarr;

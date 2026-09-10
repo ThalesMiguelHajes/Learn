@@ -3,13 +3,21 @@ import { getUser } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 
 // POST /api/checkout
-// Recebe { ebookId } e cria uma cobrança PIX na AbacatePay
+// Recebe { itemId, itemType, cpf, phone } e cria uma cobrança PIX na AbacatePay
 export async function POST(request) {
   try {
-    const { ebookId, cpf, phone } = await request.json()
+    const { itemId, itemType, cpf, phone, ebookId } = await request.json()
 
-    if (!ebookId) {
-      return NextResponse.json({ error: 'ebookId é obrigatório.' }, { status: 400 })
+    // Para retrocompatibilidade com o frontend atual que ainda usa ebookId
+    const finalItemId = itemId || ebookId
+    const finalItemType = itemType || 'ebook'
+
+    if (!finalItemId) {
+      return NextResponse.json({ error: 'itemId é obrigatório.' }, { status: 400 })
+    }
+
+    if (!['ebook', 'material', 'course'].includes(finalItemType)) {
+      return NextResponse.json({ error: 'itemType inválido.' }, { status: 400 })
     }
 
     if (!cpf || !phone) {
@@ -35,31 +43,53 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Você precisa estar logado para comprar.' }, { status: 401 })
     }
 
-    // 2. Verificar se o usuário já possui este e-book (evitar cobrar duas vezes)
+    // 2. Verificar se o usuário já possui este item (evitar cobrar duas vezes)
+    let tableName = ''
+    let idColumn = ''
+    let itemTableName = ''
+    let itemPrefix = ''
+
+    if (finalItemType === 'ebook') {
+      tableName = 'user_ebooks'
+      idColumn = 'ebook_id'
+      itemTableName = 'ebooks'
+      itemPrefix = 'E-book'
+    } else if (finalItemType === 'material') {
+      tableName = 'user_materials'
+      idColumn = 'material_id'
+      itemTableName = 'materials'
+      itemPrefix = 'Material'
+    } else if (finalItemType === 'course') {
+      tableName = 'user_courses'
+      idColumn = 'course_id'
+      itemTableName = 'courses'
+      itemPrefix = 'Curso'
+    }
+
     const { data: existing } = await supabase
-      .from('user_ebooks')
+      .from(tableName)
       .select('id')
       .eq('user_id', user.id)
-      .eq('ebook_id', ebookId)
+      .eq(idColumn, finalItemId)
       .single()
 
     if (existing) {
-      return NextResponse.json({ error: 'Você já possui este e-book na sua biblioteca.' }, { status: 409 })
+      return NextResponse.json({ error: `Você já possui este ${finalItemType} na sua biblioteca.` }, { status: 409 })
     }
 
-    // 3. Buscar dados do e-book
-    const { data: ebook, error: ebookError } = await supabase
-      .from('ebooks')
+    // 3. Buscar dados do item
+    const { data: item, error: itemError } = await supabase
+      .from(itemTableName)
       .select('id, title, price, is_active')
-      .eq('id', ebookId)
+      .eq('id', finalItemId)
       .single()
 
-    if (ebookError || !ebook) {
-      return NextResponse.json({ error: 'E-book não encontrado.' }, { status: 404 })
+    if (itemError || !item) {
+      return NextResponse.json({ error: 'Item não encontrado.' }, { status: 404 })
     }
 
-    if (!ebook.is_active) {
-      return NextResponse.json({ error: 'Este e-book não está disponível para compra.' }, { status: 403 })
+    if (!item.is_active) {
+      return NextResponse.json({ error: 'Este item não está disponível para compra.' }, { status: 403 })
     }
 
     // 3.5 Buscar dados do perfil do usuário para enviar o 'customer'
@@ -103,21 +133,22 @@ export async function POST(request) {
         },
         products: [
           {
-            externalId: ebook.id,
-            name: ebook.title,
-            description: `E-book: ${ebook.title}`,
+            externalId: item.id,
+            name: item.title,
+            description: `${itemPrefix}: ${item.title}`,
             quantity: 1,
             // AbacatePay recebe o valor em centavos (inteiro)
-            price: Math.round(ebook.price * 100),
+            price: Math.round(item.price * 100),
           },
         ],
-        // metadata é devolvido no webhook — usamos para identificar userId e ebookId
+        // metadata é devolvido no webhook — usamos para identificar a venda
         metadata: {
           userId: user.id,
-          ebookId: ebook.id,
+          itemId: item.id,
+          itemType: finalItemType,
         },
-        returnUrl: `${baseUrl}/biblioteca/sucesso?ebook=${ebook.id}`,
-        completionUrl: `${baseUrl}/biblioteca/sucesso?ebook=${ebook.id}`,
+        returnUrl: `${baseUrl}/biblioteca/sucesso?item=${item.id}&type=${finalItemType}`,
+        completionUrl: `${baseUrl}/biblioteca/sucesso?item=${item.id}&type=${finalItemType}`,
       }),
     })
 
@@ -135,7 +166,8 @@ export async function POST(request) {
       .from('pending_checkouts')
       .insert({
         user_id: user.id,
-        ebook_id: ebook.id,
+        item_id: item.id,
+        item_type: finalItemType,
         billing_id: billingId,
         billing_url: billingUrl,
         status: 'pending',

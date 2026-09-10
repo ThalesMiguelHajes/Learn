@@ -16,6 +16,7 @@ export default function AdminSidebar({ profile }) {
     { href: '/admin', label: 'Dashboard', icon: IconDashboard },
     { href: '/admin/vendas', label: 'Vendas', icon: IconWallet },
     { href: '/admin/ebooks', label: 'E-books', icon: IconBooks },
+    { href: '/admin/materiais', label: 'Materiais', icon: IconLink },
     { href: '/admin/usuarios', label: 'Usuários', icon: IconUsers },
     { href: '/admin/atribuicoes', label: 'Atribuições', icon: IconLink },
     { href: '/admin/configuracoes', label: 'Configurações', icon: IconSettings },
