@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { BUCKETS, MAX_FILE_SIZE, ACCEPTED_COVER_TYPES, ACCEPTED_MATERIAL_TYPES } from '@/lib/constants'
@@ -16,6 +16,7 @@ export default function NovoEbookPage() {
   
   // ebookFile can be a single File (PDF/ZIP) or an array of Files (HTML Slides folder)
   const [ebookFile, setEbookFile] = useState(null) 
+  const [previewHtml, setPreviewHtml] = useState(null)
   
   const [isActive, setIsActive] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -24,6 +25,53 @@ export default function NovoEbookPage() {
   const ebookInputRef = useRef(null)
   const supabase = createClient()
   const router = useRouter()
+
+  useEffect(() => {
+    if (materialType === 'html_slides' && Array.isArray(ebookFile) && ebookFile.length > 0) {
+      const indexFile = ebookFile.find(f => f.name === 'index.html' || (f.webkitRelativePath && f.webkitRelativePath.endsWith('index.html')))
+      
+      if (!indexFile) {
+        setPreviewHtml('<div style="font-family:sans-serif;padding:2rem;text-align:center;color:#ef4444;">⚠️ Arquivo index.html não encontrado na raiz da pasta. Verifique a exportação.</div>')
+        return
+      }
+
+      const buildPreview = async () => {
+        try {
+          let html = await indexFile.text()
+          
+          const urlMap = {}
+          for (const f of ebookFile) {
+            if (f === indexFile) continue
+            // Pega o caminho relativo ignorando a primeira pasta (raiz)
+            const parts = f.webkitRelativePath.split('/')
+            parts.shift()
+            const relativePath = parts.join('/')
+            urlMap[relativePath] = URL.createObjectURL(f)
+            urlMap['./' + relativePath] = urlMap[relativePath]
+          }
+
+          // Substitui caminhos de href e src pelo ObjectURL carregado
+          html = html.replace(/(href|src)=["'](.*?)["']/g, (match, p1, p2) => {
+            const cleanPath = p2.replace(/^\.\//, '').replace(/^(\.\.\/)+/, '')
+            const matchedKey = Object.keys(urlMap).find(k => k.endsWith(cleanPath))
+            if (matchedKey) {
+              return `${p1}="${urlMap[matchedKey]}"`
+            }
+            return match
+          })
+          
+          setPreviewHtml(html)
+        } catch (e) {
+          console.error(e)
+          setPreviewHtml('<div style="font-family:sans-serif;padding:2rem;text-align:center;color:#ef4444;">Erro ao processar o preview.</div>')
+        }
+      }
+      
+      buildPreview()
+    } else {
+      setPreviewHtml(null)
+    }
+  }, [ebookFile, materialType])
 
   function handleCoverSelect(e) {
     const file = e.target.files?.[0]
@@ -343,6 +391,19 @@ export default function NovoEbookPage() {
                 >
                   <IconX size={16} />
                 </button>
+              </div>
+            )}
+
+            {previewHtml && (
+              <div style={{ marginTop: '1rem', border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>
+                <div style={{ backgroundColor: 'var(--surface-light)', padding: '0.5rem 1rem', fontSize: '0.875rem', fontWeight: 600, borderBottom: '1px solid var(--border)' }}>
+                  Pré-visualização da Aula HTML
+                </div>
+                <iframe 
+                  srcDoc={previewHtml} 
+                  style={{ width: '100%', height: '400px', border: 'none', backgroundColor: '#fff' }}
+                  title="Preview"
+                />
               </div>
             )}
           </div>
