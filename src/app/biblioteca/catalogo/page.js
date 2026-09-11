@@ -4,6 +4,7 @@ import CatalogCard from '@/components/biblioteca/CatalogCard'
 import SearchBar from '@/components/biblioteca/SearchBar'
 import { Suspense } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { IconSearch } from '@/components/icons'
 
 export const metadata = {
@@ -13,6 +14,7 @@ export const metadata = {
 export default async function CatalogoPage({ searchParams }) {
   const resolvedSearchParams = await searchParams
   const q = resolvedSearchParams?.q
+  const typeFilter = resolvedSearchParams?.type || 'all'
   const supabase = await createClient()
 
   const { user } = await getUser()
@@ -34,9 +36,15 @@ export default async function CatalogoPage({ searchParams }) {
   ] = await Promise.all([queryEbooks, queryMaterials, queryCourses])
 
   let allProducts = []
-  if (ebooksData) allProducts.push(...ebooksData.map(e => ({ ...e, itemType: 'ebook' })))
-  if (materialsData) allProducts.push(...materialsData.map(m => ({ ...m, itemType: 'material' })))
-  if (coursesData) allProducts.push(...coursesData.map(c => ({ ...c, itemType: 'course' })))
+  if ((typeFilter === 'all' || typeFilter === 'ebook') && ebooksData) {
+    allProducts.push(...ebooksData.map(e => ({ ...e, itemType: 'ebook' })))
+  }
+  if ((typeFilter === 'all' || typeFilter === 'material') && materialsData) {
+    allProducts.push(...materialsData.map(m => ({ ...m, itemType: 'material' })))
+  }
+  if ((typeFilter === 'all' || typeFilter === 'course') && coursesData) {
+    allProducts.push(...coursesData.map(c => ({ ...c, itemType: 'course' })))
+  }
 
   allProducts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
@@ -69,11 +77,18 @@ export default async function CatalogoPage({ searchParams }) {
         <SearchBar placeholder="Buscar no catálogo..." />
       </Suspense>
 
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+        <Link href={`?type=all${q ? '&q='+q : ''}`} className={`btn btn-sm ${typeFilter === 'all' ? 'btn-primary' : 'btn-secondary'}`}>Tudo</Link>
+        <Link href={`?type=ebook${q ? '&q='+q : ''}`} className={`btn btn-sm ${typeFilter === 'ebook' ? 'btn-primary' : 'btn-secondary'}`}>E-books</Link>
+        <Link href={`?type=material${q ? '&q='+q : ''}`} className={`btn btn-sm ${typeFilter === 'material' ? 'btn-primary' : 'btn-secondary'}`}>Materiais</Link>
+        <Link href={`?type=course${q ? '&q='+q : ''}`} className={`btn btn-sm ${typeFilter === 'course' ? 'btn-primary' : 'btn-secondary'}`}>Cursos</Link>
+      </div>
+
       {allProducts.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon"><IconSearch size={40} /></div>
           <h3>{q ? 'Nenhum resultado' : 'Nenhum produto disponível'}</h3>
-          <p>{q ? `Não encontramos nada correspondente a "${q}". Tente outros termos!` : 'Ainda não há produtos publicados no catálogo.'}</p>
+          <p>{q ? `Não encontramos nada correspondente a "${q}". Tente outros termos!` : 'Ainda não há produtos publicados nesta categoria.'}</p>
         </div>
       ) : (
         <div className="ebook-grid">
