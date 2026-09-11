@@ -74,7 +74,9 @@ export default function MaterialsTable({ materials }) {
                   <span className="badge badge-accent">R$ {Number(material.price).toFixed(2)}</span>
                 </td>
                 <td>
-                  <span className="badge badge-info">{material.material_type?.toUpperCase() || '—'}</span>
+                  <span className="badge badge-info">
+                    {material.material_type === 'html_slides' ? 'SLIDES' : (material.material_type?.toUpperCase() || '—')}
+                  </span>
                 </td>
                 <td>
                   <span className={`badge ${material.is_active ? 'badge-success' : 'badge-error'}`}>

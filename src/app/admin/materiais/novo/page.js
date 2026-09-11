@@ -227,7 +227,7 @@ export default function NovoEbookPage() {
       <div className="page-header">
         <div className="page-header-left">
           <h1>Novo Material</h1>
-          <p>Adicione um novo livro digital ou apresentação à plataforma</p>
+          <p>Adicione um novo livro digital ou slides à plataforma</p>
         </div>
       </div>
 
@@ -289,7 +289,7 @@ export default function NovoEbookPage() {
             >
               <option value="pdf">PDF</option>
               <option value="zip">Arquivo ZIP</option>
-              <option value="html_slides">Apresentação HTML (Pasta)</option>
+              <option value="html_slides">Slides</option>
             </select>
           </div>
 
