@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { createServiceClient } from '@/lib/supabase/server'
+import { getFeaturedCatalog } from '@/lib/services/catalog'
 import Footer from '@/components/Footer'
 import Reveal from '@/components/Reveal'
 import PartnerBadge from '@/components/ui/PartnerBadge'
@@ -10,6 +10,10 @@ export const metadata = {
   title: 'KodaBooks | Evolua seu conhecimento',
   description: 'Acesse e-books exclusivos e práticos na KodaBooks. Feito com ScorpionBits.',
 }
+
+// ISR: O Next.js fará o build dessa página estática e vai revalidá-la em cache a cada 1 hora (3600 segundos).
+// Isso poupa o banco de dados de sobrecarga e faz o site carregar instantaneamente na CDN.
+export const revalidate = 3600
 
 const FEATURES = [
   { icon: IconZap, title: 'Acesso Imediato', text: 'Receba seu material na mesma hora e comece a aprender sem enrolação.' },
@@ -24,28 +28,22 @@ const FAQ = [
 ]
 
 export default async function LandingPage() {
-  const supabase = createServiceClient()
+  let ebooks = []
+  let materials = []
+  let courses = []
 
-  // Buscar até 4 e-books ativos para a vitrine
-  const { data: ebooks } = await supabase
-    .from('ebooks')
-    .select('*')
-    .eq('is_active', true)
-    .limit(4)
-
-  // Buscar até 4 materiais ativos para a vitrine
-  const { data: materials } = await supabase
-    .from('materials')
-    .select('*')
-    .eq('is_active', true)
-    .limit(4)
-
-  // Buscar até 4 cursos ativos para a vitrine
-  const { data: courses } = await supabase
-    .from('courses')
-    .select('*')
-    .eq('is_active', true)
-    .limit(4)
+  try {
+    // Buscamos todos os dados usando o serviço abstraído, mantendo o componente UI limpo
+    const catalog = await getFeaturedCatalog()
+    
+    ebooks = catalog.ebooks
+    materials = catalog.materials
+    courses = catalog.courses
+  } catch (error) {
+    console.error('Erro ao buscar catálogo na página:', error)
+    // Lançamos o erro para que o Next.js ative o error.js automaticamente
+    throw new Error('Não foi possível carregar o catálogo no momento.')
+  }
 
   return (
     <div className="page-shell">
