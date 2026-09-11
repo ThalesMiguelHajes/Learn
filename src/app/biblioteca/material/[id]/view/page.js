@@ -81,15 +81,15 @@ export default async function ViewMaterialPage({ params }) {
       zIndex: 9999,
       display: 'flex', 
       flexDirection: 'column', 
-      backgroundColor: 'var(--background)' 
+      backgroundColor: 'var(--bg-primary)' 
     }}>
       {/* Header Bar */}
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
         padding: '12px 24px', 
-        backgroundColor: 'var(--surface)', 
-        borderBottom: '1px solid var(--border)',
+        backgroundColor: 'var(--bg-secondary)', 
+        borderBottom: '1px solid var(--border-subtle)',
         gap: '16px'
       }}>
         <Link href={`/biblioteca/material/${material.id}`} className="btn btn-ghost btn-sm" style={{ padding: '8px' }}>
