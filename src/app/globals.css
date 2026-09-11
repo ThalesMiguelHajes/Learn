@@ -438,6 +438,11 @@ h4 {
   outline: none;
 }
 
+select.form-input option {
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
 .form-input::placeholder {
   color: var(--text-tertiary);
 }
