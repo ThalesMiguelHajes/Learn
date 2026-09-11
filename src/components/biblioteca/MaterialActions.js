@@ -20,15 +20,27 @@ export default function MaterialActions({ materialId, fileType }) {
             <IconBookOpen size={16} /> Ler Agora
           </Link>
         )}
+        {fileType === 'html_slides' && (
+          <Link
+            href={`/biblioteca/material/${materialId}/view`}
+            className="btn btn-primary justify-center"
+            style={{ flex: 1 }}
+          >
+            <IconBookOpen size={16} /> Visualizar Apresentação
+          </Link>
+        )}
+        
         {/* Deixa o navegador baixar diretamente via Content-Disposition da rota,
             em vez de carregar o arquivo inteiro em memória com fetch + blob. */}
-        <a
-          href={`/api/download/${materialId}?type=material`}
-          className="btn btn-secondary justify-center"
-          style={{ flex: 1 }}
-        >
-          <IconDownload size={16} /> Download
-        </a>
+        {fileType !== 'html_slides' && (
+          <a
+            href={`/api/download/${materialId}?type=material`}
+            className="btn btn-secondary justify-center"
+            style={{ flex: 1 }}
+          >
+            <IconDownload size={16} /> Download
+          </a>
+        )}
         <button
           className="btn btn-secondary justify-center"
           onClick={() => setShowModal(true)}

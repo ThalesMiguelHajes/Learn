@@ -17,4 +17,4 @@ export const MAX_FILE_SIZE = {
 
 export const ACCEPTED_COVER_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 export const ACCEPTED_EBOOK_TYPES = ['application/pdf', 'application/epub+zip']
-export const ACCEPTED_MATERIAL_TYPES = ['application/pdf', 'application/zip', 'application/x-zip-compressed']
+export const ACCEPTED_MATERIAL_TYPES = ['application/pdf', 'application/zip', 'application/x-zip-compressed', 'text/html']

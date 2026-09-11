@@ -10,9 +10,13 @@ export default function NovoEbookPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
+  const [materialType, setMaterialType] = useState('pdf') // 'pdf', 'zip', 'html_slides'
   const [coverFile, setCoverFile] = useState(null)
   const [coverPreview, setCoverPreview] = useState(null)
-  const [ebookFile, setEbookFile] = useState(null)
+  
+  // ebookFile can be a single File (PDF/ZIP) or an array of Files (HTML Slides folder)
+  const [ebookFile, setEbookFile] = useState(null) 
+  
   const [isActive, setIsActive] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -40,19 +44,27 @@ export default function NovoEbookPage() {
   }
 
   function handleEbookSelect(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const files = e.target.files
+    if (!files || files.length === 0) return
 
-    if (!ACCEPTED_MATERIAL_TYPES.includes(file.type)) {
-      setError('Formato de arquivo inválido. Use PDF ou ZIP.')
-      return
+    if (materialType === 'html_slides') {
+      // For folders, we get multiple files
+      const fileArray = Array.from(files)
+      // We could add size checks here if needed
+      setEbookFile(fileArray)
+    } else {
+      // For single files (PDF / ZIP)
+      const file = files[0]
+      if (!ACCEPTED_MATERIAL_TYPES.includes(file.type)) {
+        setError('Formato de arquivo inválido. Use PDF ou ZIP.')
+        return
+      }
+      if (file.size > MAX_FILE_SIZE.MATERIAL) {
+        setError('O arquivo do material deve ter no máximo 50MB.')
+        return
+      }
+      setEbookFile(file)
     }
-    if (file.size > MAX_FILE_SIZE.MATERIAL) {
-      setError('O arquivo do material deve ter no máximo 50MB.')
-      return
-    }
-
-    setEbookFile(file)
     setError('')
   }
 
@@ -70,8 +82,8 @@ export default function NovoEbookPage() {
       setError('Selecione uma imagem de capa.')
       return
     }
-    if (!ebookFile) {
-      setError('Selecione o arquivo do material (PDF ou ZIP).')
+    if (!ebookFile || (Array.isArray(ebookFile) && ebookFile.length === 0)) {
+      setError('Selecione o arquivo ou pasta do material.')
       return
     }
 
@@ -94,29 +106,56 @@ export default function NovoEbookPage() {
         .from(BUCKETS.COVERS)
         .getPublicUrl(coverPath)
 
-      // Upload ebook file
-      const ebookExt = ebookFile.name.split('.').pop()
-      const ebookPath = `${timestamp}-${Math.random().toString(36).substring(7)}.${ebookExt}`
+      let finalFilePath = ''
 
-      const { error: ebookError } = await supabase.storage
-        .from(BUCKETS.MATERIALS)
-        .upload(ebookPath, ebookFile)
+      if (materialType === 'html_slides') {
+        // Upload folder
+        const folderName = `${timestamp}-${Math.random().toString(36).substring(7)}/slides`
+        finalFilePath = folderName
+        
+        // Upload each file in the folder
+        const uploadPromises = ebookFile.map(async (file) => {
+          // webkitRelativePath looks like "folderName/subfolder/file.ext"
+          // We remove the top-level folder name so it starts from the inside
+          const relativePathParts = file.webkitRelativePath.split('/')
+          relativePathParts.shift() // remove top folder
+          const safeRelativePath = relativePathParts.join('/') || file.name
+          
+          const filePath = `${folderName}/${safeRelativePath}`
+          
+          const { error: fileError } = await supabase.storage
+            .from(BUCKETS.MATERIALS)
+            .upload(filePath, file)
+            
+          if (fileError) throw new Error(`Erro ao enviar arquivo ${file.name}: ` + fileError.message)
+        })
 
-      if (ebookError) throw new Error('Erro ao enviar arquivo: ' + ebookError.message)
+        await Promise.all(uploadPromises)
+        
+      } else {
+        // Upload single file (PDF/ZIP)
+        const ebookExt = ebookFile.name.split('.').pop()
+        finalFilePath = `${timestamp}-${Math.random().toString(36).substring(7)}.${ebookExt}`
 
-      // Insert ebook record
+        const { error: ebookError } = await supabase.storage
+          .from(BUCKETS.MATERIALS)
+          .upload(finalFilePath, ebookFile)
+
+        if (ebookError) throw new Error('Erro ao enviar arquivo: ' + ebookError.message)
+      }
+
+      // Insert material record (removed file_name which doesn't exist)
       const { error: dbError } = await supabase.from('materials').insert({
         title,
         description,
         price: parseFloat(price) || 0,
         cover_url: coverUrlData.publicUrl,
-        file_path: ebookPath,
-        file_name: ebookFile.name,
-        material_type: ebookExt.toLowerCase() === 'zip' ? 'zip' : 'pdf',
+        file_path: finalFilePath,
+        material_type: materialType,
         is_active: isActive,
       })
 
-      if (dbError) throw new Error('Erro ao salvar: ' + dbError.message)
+      if (dbError) throw new Error('Erro ao salvar no banco: ' + dbError.message)
 
       router.push('/admin/materiais')
       router.refresh()
@@ -127,12 +166,19 @@ export default function NovoEbookPage() {
     }
   }
 
+  // Reset file selection when changing material type
+  const handleTypeChange = (e) => {
+    setMaterialType(e.target.value)
+    setEbookFile(null)
+    if (ebookInputRef.current) ebookInputRef.current.value = ''
+  }
+
   return (
     <>
       <div className="page-header">
         <div className="page-header-left">
           <h1>Novo Material</h1>
-          <p>Adicione um novo livro digital à plataforma</p>
+          <p>Adicione um novo livro digital ou apresentação à plataforma</p>
         </div>
       </div>
 
@@ -182,6 +228,21 @@ export default function NovoEbookPage() {
               style={{ maxWidth: '200px' }}
             />
           </div>
+          
+          <div className="form-group mb-lg">
+            <label htmlFor="materialType" className="form-label">Tipo de Material *</label>
+            <select 
+              id="materialType" 
+              className="form-input" 
+              value={materialType} 
+              onChange={handleTypeChange}
+              style={{ maxWidth: '200px' }}
+            >
+              <option value="pdf">PDF</option>
+              <option value="zip">Arquivo ZIP</option>
+              <option value="html_slides">Apresentação HTML (Pasta)</option>
+            </select>
+          </div>
 
           <div className="form-group mb-lg">
             <label className="form-label">Imagem de Capa *</label>
@@ -218,34 +279,66 @@ export default function NovoEbookPage() {
           </div>
 
           <div className="form-group mb-lg">
-            <label className="form-label">Arquivo do Material (PDF / ePub) *</label>
+            <label className="form-label">
+              {materialType === 'html_slides' ? 'Pasta do Material (HTML/CSS/JS) *' : 'Arquivo do Material *'}
+            </label>
             <div className="file-upload" onClick={() => ebookInputRef.current?.click()}>
-              <input
-                ref={ebookInputRef}
-                type="file"
-                accept=".pdf,.zip"
-                onChange={handleEbookSelect}
-                style={{ display: 'none' }}
-              />
+              {materialType === 'html_slides' ? (
+                <input
+                  ref={ebookInputRef}
+                  type="file"
+                  webkitdirectory="true"
+                  directory="true"
+                  multiple
+                  onChange={handleEbookSelect}
+                  style={{ display: 'none' }}
+                />
+              ) : (
+                <input
+                  ref={ebookInputRef}
+                  type="file"
+                  accept=".pdf,.zip"
+                  onChange={handleEbookSelect}
+                  style={{ display: 'none' }}
+                />
+              )}
+              
               <div className="upload-icon"><IconFileText size={32} /></div>
               <div className="upload-text">
-                Clique para selecionar ou <strong>arraste o arquivo</strong>
+                Clique para selecionar {materialType === 'html_slides' ? 'uma pasta' : 'ou arraste o arquivo'}
               </div>
-              <div className="upload-hint">PDF ou ZIP — Máx. 50MB</div>
+              <div className="upload-hint">
+                {materialType === 'html_slides' ? 'Selecione a pasta raiz contendo o index.html' : 'PDF ou ZIP — Máx. 50MB'}
+              </div>
             </div>
+            
             {ebookFile && (
               <div className="file-preview">
                 <div className="file-preview-image flex items-center justify-center">
                   <IconFileText size={24} />
                 </div>
                 <div className="file-preview-info">
-                  <div className="file-preview-name">{ebookFile.name}</div>
-                  <div className="file-preview-size">{formatFileSize(ebookFile.size)}</div>
+                  {materialType === 'html_slides' ? (
+                    <>
+                      <div className="file-preview-name">{ebookFile.length} arquivos selecionados</div>
+                      <div className="file-preview-size">
+                        Pasta pronta para envio
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="file-preview-name">{ebookFile.name}</div>
+                      <div className="file-preview-size">{formatFileSize(ebookFile.size)}</div>
+                    </>
+                  )}
                 </div>
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"
-                  onClick={() => setEbookFile(null)}
+                  onClick={() => {
+                    setEbookFile(null)
+                    if (ebookInputRef.current) ebookInputRef.current.value = ''
+                  }}
                 >
                   <IconX size={16} />
                 </button>
