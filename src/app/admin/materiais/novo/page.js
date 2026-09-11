@@ -113,21 +113,24 @@ export default function NovoEbookPage() {
         const folderName = `${timestamp}-${Math.random().toString(36).substring(7)}/slides`
         finalFilePath = folderName
         
-        // Upload each file in the folder sequentially to avoid "Too many connections"
-        for (const file of ebookFile) {
-          // webkitRelativePath looks like "folderName/subfolder/file.ext"
-          // We remove the top-level folder name so it starts from the inside
-          const relativePathParts = file.webkitRelativePath.split('/')
-          relativePathParts.shift() // remove top folder
-          const safeRelativePath = relativePathParts.join('/') || file.name
+        // Upload files in batches of 20 to speed up without hitting connection limits
+        const CONCURRENT_UPLOADS = 20
+        for (let i = 0; i < ebookFile.length; i += CONCURRENT_UPLOADS) {
+          const batch = Array.from(ebookFile).slice(i, i + CONCURRENT_UPLOADS)
           
-          const filePath = `${folderName}/${safeRelativePath}`
-          
-          const { error: fileError } = await supabase.storage
-            .from(BUCKETS.MATERIALS)
-            .upload(filePath, file)
+          await Promise.all(batch.map(async (file) => {
+            const relativePathParts = file.webkitRelativePath.split('/')
+            relativePathParts.shift() // remove top folder
+            const safeRelativePath = relativePathParts.join('/') || file.name
             
-          if (fileError) throw new Error(`Erro ao enviar arquivo ${file.name}: ` + fileError.message)
+            const filePath = `${folderName}/${safeRelativePath}`
+            
+            const { error: fileError } = await supabase.storage
+              .from(BUCKETS.MATERIALS)
+              .upload(filePath, file)
+              
+            if (fileError) throw new Error(`Erro ao enviar arquivo ${file.name}: ` + fileError.message)
+          }))
         }
         
       } else {
