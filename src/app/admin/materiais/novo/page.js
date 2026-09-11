@@ -113,8 +113,8 @@ export default function NovoEbookPage() {
         const folderName = `${timestamp}-${Math.random().toString(36).substring(7)}/slides`
         finalFilePath = folderName
         
-        // Upload each file in the folder
-        const uploadPromises = ebookFile.map(async (file) => {
+        // Upload each file in the folder sequentially to avoid "Too many connections"
+        for (const file of ebookFile) {
           // webkitRelativePath looks like "folderName/subfolder/file.ext"
           // We remove the top-level folder name so it starts from the inside
           const relativePathParts = file.webkitRelativePath.split('/')
@@ -128,9 +128,7 @@ export default function NovoEbookPage() {
             .upload(filePath, file)
             
           if (fileError) throw new Error(`Erro ao enviar arquivo ${file.name}: ` + fileError.message)
-        })
-
-        await Promise.all(uploadPromises)
+        }
         
       } else {
         // Upload single file (PDF/ZIP)
