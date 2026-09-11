@@ -57,7 +57,7 @@ export default function LoginPage() {
       <div className="auth-card glass-card-strong">
         <div className="auth-logo">
           <h1>
-            <span className="text-gradient">Koda</span>Books
+            <span className="text-gradient">Learn</span>
           </h1>
           <p>Acesse sua biblioteca digital</p>
           <div className="flex items-center justify-center mt-md">

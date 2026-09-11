@@ -3,7 +3,7 @@ import Footer from '@/components/Footer'
 import { IconArrowLeft } from '@/components/icons'
 
 export const metadata = {
-  title: 'Termos de Uso — KodaBooks',
+  title: 'Termos de Uso — Learn',
 }
 
 export default function TermosPage() {
@@ -19,7 +19,7 @@ export default function TermosPage() {
           <p className="legal-updated">Última atualização: 27 de agosto de 2026</p>
 
           <p>
-            Estes Termos de Uso regulam o acesso e a utilização da plataforma KodaBooks
+            Estes Termos de Uso regulam o acesso e a utilização da plataforma Learn
             (&ldquo;Plataforma&rdquo;), operada pela ScorpionBits, para a venda e distribuição de
             e-books digitais. Ao criar uma conta ou realizar uma compra, você concorda com
             as condições descritas a seguir.

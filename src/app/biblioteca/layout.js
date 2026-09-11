@@ -2,7 +2,7 @@ import { requireCliente } from '@/lib/auth'
 import ClientHeader from '@/components/biblioteca/ClientHeader'
 
 export const metadata = {
-  title: 'Minha Biblioteca — KodaBooks',
+  title: 'Minha Biblioteca — Learn',
 }
 
 export default async function BibliotecaLayout({ children }) {

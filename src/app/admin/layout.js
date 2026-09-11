@@ -2,7 +2,7 @@ import { requireAdmin } from '@/lib/auth'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 
 export const metadata = {
-  title: 'Painel Admin — KodaBooks',
+  title: 'Painel Admin — Learn',
 }
 
 export default async function AdminLayout({ children }) {

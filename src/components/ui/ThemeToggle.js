@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { IconSun, IconMoon } from '@/components/icons'
 
-export const THEME_STORAGE_KEY = 'kodabooks-theme'
+export const THEME_STORAGE_KEY = 'learn-theme'
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState('dark')

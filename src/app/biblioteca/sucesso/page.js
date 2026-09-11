@@ -7,7 +7,7 @@ import AutoRefresh from '@/components/biblioteca/AutoRefresh'
 import { IconCheckCircle, IconClock, IconBookOpen } from '@/components/icons'
 
 export const metadata = {
-  title: 'Status do Pagamento — KodaBooks',
+  title: 'Status do Pagamento — Learn',
 }
 
 export default async function SucessoPage({ searchParams }) {

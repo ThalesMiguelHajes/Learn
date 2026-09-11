@@ -7,8 +7,8 @@ import PartnerBadge from '@/components/ui/PartnerBadge'
 import { IconZap, IconDevices, IconLock } from '@/components/icons'
 
 export const metadata = {
-  title: 'KodaBooks | Evolua seu conhecimento',
-  description: 'Acesse e-books exclusivos e práticos na KodaBooks. Feito com ScorpionBits.',
+  title: 'Learn | Desenvolvimento de Jogos',
+  description: 'Aprenda desenvolvimento de jogos do zero no Learn. Feito com ScorpionBits.',
 }
 
 // ISR: O Next.js fará o build dessa página estática e vai revalidá-la em cache a cada 1 hora (3600 segundos).
@@ -17,14 +17,14 @@ export const revalidate = 3600
 
 const FEATURES = [
   { icon: IconZap, title: 'Acesso Imediato', text: 'Receba seu material na mesma hora e comece a aprender sem enrolação.' },
-  { icon: IconDevices, title: 'Leia em Qualquer Lugar', text: 'Baixe seus e-books e estude no celular, tablet ou computador, a qualquer momento.' },
+  { icon: IconDevices, title: 'Aprenda no seu Ritmo', text: 'Acesse seus cursos e estude no celular, tablet ou computador, a qualquer momento.' },
   { icon: IconLock, title: 'Pagamento Seguro', text: 'Pagamentos rápidos e totalmente seguros processados via AbacatePay (PIX).' },
 ]
 
 const FAQ = [
-  { q: 'Como recebo o acesso?', a: 'Após a confirmação do pagamento, o e-book será adicionado automaticamente à sua biblioteca virtual e você receberá um e-mail de aviso.' },
+  { q: 'Como recebo o acesso?', a: 'Após a confirmação do pagamento, o conteúdo será adicionado automaticamente à sua biblioteca virtual e você receberá um e-mail de aviso.' },
   { q: 'É seguro comprar?', a: 'Sim, utilizamos a AbacatePay para intermediar todos os pagamentos (PIX), garantindo 100% de segurança na sua transação e seus dados.' },
-  { q: 'Posso ler offline?', a: 'Sim! Uma vez liberado na sua biblioteca, você pode baixar o PDF para o seu dispositivo e ler quando e onde quiser, sem internet.' },
+  { q: 'Posso ler offline?', a: 'Sim! Uma vez liberado na sua biblioteca, você terá acesso imediato para o seu dispositivo e ler quando e onde quiser, sem internet.' },
 ]
 
 export default async function LandingPage() {
@@ -50,7 +50,7 @@ export default async function LandingPage() {
       <header className="landing-header">
         <div className="landing-header-brand">
           <h1 className="landing-logo">
-            <span className="text-gradient">Koda</span>Books
+            <span className="text-gradient">Learn</span>
           </h1>
           <div className="landing-header-partner">
             <PartnerBadge label="by" />
@@ -70,11 +70,11 @@ export default async function LandingPage() {
         <Reveal y={20}>
           <section className="landing-hero">
             <h2 className="landing-hero-title">
-              Evolua seu conhecimento com a <span className="text-gradient">KodaBooks</span>
+              Aprenda a criar seus próprios jogos com o <span className="text-gradient">Learn</span>
             </h2>
             <p className="landing-hero-subtitle">
-              Descubra materiais práticos, diretos ao ponto e aprenda no seu ritmo.
-              Sua biblioteca digital premium a um clique de distância.
+              Aprenda lógica de programação, domine motores gráficos e crie seus jogos do zero.
+              Cursos práticos, diretos ao ponto, para alavancar sua jornada gamedev.
             </p>
             <div className="flex gap-md justify-center" style={{ flexWrap: 'wrap' }}>
               <Link href="/cadastro" className="btn btn-primary btn-lg">
@@ -151,8 +151,8 @@ export default async function LandingPage() {
             <section className="landing-showcase" style={{ paddingTop: '2rem' }}>
               <div className="landing-showcase-inner">
                 <div className="text-center mb-xl">
-                  <h2>Destaques de E-books</h2>
-                  <p className="text-secondary">Os e-books mais procurados do momento.</p>
+                  <h2>Outros Materiais</h2>
+                  <p className="text-secondary">Materiais complementares para turbinar seus estudos.</p>
                 </div>
 
                 <div className="ebook-grid">

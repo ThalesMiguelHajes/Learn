@@ -22,7 +22,7 @@ export default function ClientHeader({ profile }) {
     <header className="biblioteca-header">
       <div className="biblioteca-header-logo">
         <div>
-          <span className="text-gradient">Koda</span>Books
+          <span className="text-gradient">Learn</span>
         </div>
         <div className="biblioteca-header-divider"></div>
         <PartnerBadge size={24} />

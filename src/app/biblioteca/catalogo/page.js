@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { IconSearch } from '@/components/icons'
 
 export const metadata = {
-  title: 'Catálogo — KodaBooks',
+  title: 'Catálogo — Learn',
 }
 
 export default async function CatalogoPage({ searchParams }) {

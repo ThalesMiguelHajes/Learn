@@ -105,7 +105,7 @@ export async function POST(request) {
       console.error('Erro ao atualizar perfil:', updateError)
     }
 
-    const customerName = profile?.full_name || user.user_metadata?.full_name || 'Cliente KodaBooks'
+    const customerName = profile?.full_name || user.user_metadata?.full_name || 'Cliente Learn'
     const customerEmail = profile?.email || user.email
     const customerCpf = profile?.cpf || cpf
     const customerPhone = profile?.phone || phone

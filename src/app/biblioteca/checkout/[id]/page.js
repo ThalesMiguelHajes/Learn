@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/auth'
 import CheckoutClient from '@/components/biblioteca/CheckoutClient'
 
 export const metadata = {
-  title: 'Finalizar Compra — KodaBooks',
+  title: 'Finalizar Compra — Learn',
 }
 
 export default async function CheckoutPage({ params, searchParams }) {

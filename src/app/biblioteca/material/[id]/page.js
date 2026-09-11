@@ -16,7 +16,7 @@ export async function generateMetadata({ params }) {
     .single()
 
   return {
-    title: material ? `${material.title} — KodaBooks` : 'Detalhes do Livro — KodaBooks',
+    title: material ? `${material.title} — Learn` : 'Detalhes do Livro — Learn',
   }
 }
 

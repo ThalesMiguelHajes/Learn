@@ -39,7 +39,7 @@ export default function AdminSidebar({ profile }) {
       <div className="sidebar-header">
         <div>
           <span className="sidebar-logo">
-            <span className="text-gradient">Koda</span>Books
+            <span className="text-gradient">Learn</span>
           </span>
           <span className="sidebar-badge">Admin</span>
         </div>

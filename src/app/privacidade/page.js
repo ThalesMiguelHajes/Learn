@@ -3,7 +3,7 @@ import Footer from '@/components/Footer'
 import { IconArrowLeft } from '@/components/icons'
 
 export const metadata = {
-  title: 'Política de Privacidade — KodaBooks',
+  title: 'Política de Privacidade — Learn',
 }
 
 export default function PrivacidadePage() {
@@ -19,7 +19,7 @@ export default function PrivacidadePage() {
           <p className="legal-updated">Última atualização: 27 de agosto de 2026</p>
 
           <p>
-            Esta Política de Privacidade explica como a KodaBooks, operada pela ScorpionBits,
+            Esta Política de Privacidade explica como a Learn, operada pela ScorpionBits,
             coleta, usa e protege os dados pessoais dos usuários da plataforma, em conformidade
             com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).
           </p>

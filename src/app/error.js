@@ -16,7 +16,7 @@ export default function Error({ error, reset }) {
         <div className="landing-header-brand">
           <Link href="/">
             <h1 className="landing-logo">
-              <span className="text-gradient">Koda</span>Books
+              <span className="text-gradient">Learn</span>
             </h1>
           </Link>
         </div>

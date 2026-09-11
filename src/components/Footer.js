@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="site-footer-grid">
         <div>
           <h2 className="site-footer-brand">
-            <span className="text-gradient">Koda</span>Books
+            <span className="text-gradient">Learn</span>
           </h2>
           <p className="text-secondary mb-lg" style={{ fontSize: '0.9rem' }}>
             Evolua seu conhecimento com e-books práticos e diretos ao ponto.
@@ -34,7 +34,7 @@ export default function Footer() {
       </div>
 
       <div className="site-footer-bottom">
-        <p>&copy; {new Date().getFullYear()} KodaBooks. Todos os direitos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} Learn. Todos os direitos reservados.</p>
         <span>Pagamento Seguro via <strong>AbacatePay</strong></span>
       </div>
     </footer>

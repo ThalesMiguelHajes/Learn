@@ -50,7 +50,7 @@ export default function PlayerClient({ course, modules = [], materials = [] }) {
   useEffect(() => {
     if (!course?.id) return
     try {
-      const saved = localStorage.getItem(`kodabooks_course_completed_${course.id}`)
+      const saved = localStorage.getItem(`learn_course_completed_${course.id}`)
       if (saved) {
         setCompletedLessonIds(JSON.parse(saved))
       }
@@ -68,7 +68,7 @@ export default function PlayerClient({ course, modules = [], materials = [] }) {
         : [...prev, lessonId]
 
       try {
-        localStorage.setItem(`kodabooks_course_completed_${course.id}`, JSON.stringify(next))
+        localStorage.setItem(`learn_course_completed_${course.id}`, JSON.stringify(next))
       } catch {
         // Ignore localStorage errors
       }

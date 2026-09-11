@@ -15,7 +15,7 @@ export async function generateMetadata({ params }) {
     .single()
 
   return {
-    title: playlist ? `${playlist.title} — KodaBooks` : 'Playlist — KodaBooks',
+    title: playlist ? `${playlist.title} — Learn` : 'Playlist — Learn',
   }
 }
 

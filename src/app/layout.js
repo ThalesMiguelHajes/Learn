@@ -1,9 +1,9 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'KodaBooks — Plataforma de E-books',
-  description: 'Sua biblioteca digital de e-books premium. Acesse seus livros de qualquer lugar.',
-  keywords: ['ebooks', 'livros digitais', 'biblioteca digital', 'KodaBooks'],
+  title: 'Learn — Plataforma de Ensino de Jogos',
+  description: 'Sua plataforma definitiva para aprender desenvolvimento de jogos, programação e motores gráficos.',
+  keywords: ['jogos', 'desenvolvimento de jogos', 'game dev', 'programação', 'Learn'],
 }
 
 export const viewport = {
@@ -14,7 +14,7 @@ export const viewport = {
 
 const THEME_INIT_SCRIPT = `
 try {
-  var t = localStorage.getItem('kodabooks-theme');
+  var t = localStorage.getItem('learn-theme');
   if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
 } catch (e) {}
 `

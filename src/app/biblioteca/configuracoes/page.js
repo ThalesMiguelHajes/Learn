@@ -2,7 +2,7 @@ import { requireCliente } from '@/lib/auth'
 import SettingsView from '@/components/settings/SettingsView'
 
 export const metadata = {
-  title: 'Configurações — KodaBooks',
+  title: 'Configurações — Learn',
 }
 
 export default async function BibliotecaConfiguracoesPage() {

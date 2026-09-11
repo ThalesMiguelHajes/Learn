@@ -14,11 +14,11 @@ export async function generateMetadata({ params }) {
     .single()
 
   if (!course) {
-    return { title: 'Curso não encontrado — KodaBooks' }
+    return { title: 'Curso não encontrado — Learn' }
   }
 
   return {
-    title: `${course.title} — KodaBooks`,
+    title: `${course.title} — Learn`,
     description: course.description
   }
 }
