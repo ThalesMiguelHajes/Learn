@@ -72,7 +72,17 @@ export default async function ViewMaterialPage({ params }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+    <div style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      right: 0, 
+      bottom: 0, 
+      zIndex: 9999,
+      display: 'flex', 
+      flexDirection: 'column', 
+      backgroundColor: 'var(--background)' 
+    }}>
       {/* Header Bar */}
       <div style={{ 
         display: 'flex', 
